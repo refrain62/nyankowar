@@ -5,9 +5,7 @@ import { playOsc } from '../core/player';
  */
 export const playGashi = (ctx: AudioContext) => {
   const now = ctx.currentTime;
-  // 低音の衝撃
   playOsc(ctx, { freq: 150, type: 'square', dur: 0.1, vol: 0.08, endFreq: 40 });
-  // アタック音 (ノイズ風)
   const o = ctx.createOscillator(); const g = ctx.createGain();
   o.type = 'sawtooth'; o.frequency.setValueAtTime(800, now);
   g.gain.setValueAtTime(0.05, now); g.gain.linearRampToValueAtTime(0, now + 0.04);
@@ -16,11 +14,19 @@ export const playGashi = (ctx: AudioContext) => {
 };
 
 /**
- * にゃんこ砲発射音
+ * にゃんこ砲：エネルギー充填音
+ * ピッチが急上昇する電子音
  */
-export const playCannon = (ctx: AudioContext) => {
-  // ウィィィンという充填
-  playOsc(ctx, { freq: 100, type: 'sawtooth', dur: 0.5, vol: 0.1, endFreq: 800 });
-  // ドォォォンという爆発
-  playOsc(ctx, { freq: 60, type: 'square', dur: 1.5, vol: 0.2, endFreq: 10 });
+export const playCannonCharge = (ctx: AudioContext) => {
+  playOsc(ctx, { freq: 100, type: 'sawtooth', dur: 0.5, vol: 0.1, endFreq: 1200 });
+};
+
+/**
+ * にゃんこ砲：発射・爆発音
+ * 低音の響く爆発
+ */
+export const playCannonExplosion = (ctx: AudioContext) => {
+  playOsc(ctx, { freq: 80, type: 'square', dur: 1.5, vol: 0.2, endFreq: 10 });
+  // 高音のノイズを混ぜて鋭さを出す
+  playOsc(ctx, { freq: 400, type: 'sawtooth', dur: 0.2, vol: 0.1, endFreq: 50 });
 };

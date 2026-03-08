@@ -36,13 +36,13 @@ export const drawGame = (ctx: CanvasRenderingContext2D, s: any, stage: StageConf
     ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
 
     switch (u.unitType) {
-      case 'BASIC': drawCatBasic(ctx, u.stats); break;
-      case 'TANK':  drawCatTank(ctx, u.stats); break;
+      case 'BASIC': drawCatBasic(ctx, u.stats, timestamp); break;
+      case 'TANK':  drawCatTank(ctx, u.stats, timestamp); break;
       case 'BATTLE': drawCatBattle(ctx, u.stats, timestamp); break;
       case 'LEGS':  drawCatLegs(ctx, u.stats, timestamp); break;
-      case 'COW':   drawCatCow(ctx, u.stats); break;
+      case 'COW':   drawCatCow(ctx, u.stats, timestamp); break;
       case 'BIRD':  drawCatBird(ctx, u.stats, timestamp); break;
-      case 'FISH':  drawCatFish(ctx, u.stats); break;
+      case 'FISH':  drawCatFish(ctx, u.stats, timestamp); break;
       case 'LIZARD': drawCatLizard(ctx, u.stats, timestamp); break;
       case 'ENEMY': drawDogEnemy(ctx, u.stats); break;
       case 'HIPPO': drawEnemyHippo(ctx, u.stats, timestamp); break;
@@ -67,14 +67,16 @@ const drawTitleBackground = (ctx: CanvasRenderingContext2D, timestamp: number) =
   ctx.fillStyle = sky; ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   ctx.fillStyle = '#229954'; ctx.fillRect(0, CANVAS_HEIGHT - 55, CANVAS_WIDTH, 10);
   ctx.fillStyle = '#7d6608'; ctx.fillRect(0, CANVAS_HEIGHT - 45, CANVAS_WIDTH, 45);
+
   const drawTitleCat = (x: number, y: number, unitType: string, stats: any) => {
     const bob = Math.sin((timestamp + x * 10) / 50) * 8;
     ctx.save(); ctx.translate(x, y + bob); ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
-    if (unitType === 'BASIC') drawCatBasic(ctx, stats);
-    if (unitType === 'TANK') drawCatTank(ctx, stats);
+    if (unitType === 'BASIC') drawCatBasic(ctx, stats, timestamp);
+    if (unitType === 'TANK') drawCatTank(ctx, stats, timestamp);
     if (unitType === 'BATTLE') drawCatBattle(ctx, stats, timestamp);
     ctx.restore();
   };
+
   drawTitleCat(CANVAS_WIDTH * 0.3, CANVAS_HEIGHT - 70, 'BASIC', { radius: 18, color: '#ffffff' });
   drawTitleCat(CANVAS_WIDTH * 0.5, CANVAS_HEIGHT - 70, 'TANK', { radius: 25, color: '#f0f0f0' });
   drawTitleCat(CANVAS_WIDTH * 0.7, CANVAS_HEIGHT - 70, 'BATTLE', { radius: 18, color: '#ffcccc' });
@@ -96,6 +98,8 @@ const drawUiOverlay = (ctx: CanvasRenderingContext2D, money: number, walletLevel
 };
 
 const drawCannonEffect = (ctx: CanvasRenderingContext2D) => {
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.fillRect(100, CANVAS_HEIGHT - 100, CANVAS_WIDTH, 40);
-  ctx.strokeStyle = '#f1c40f'; ctx.lineWidth = 4; ctx.strokeRect(100, CANVAS_HEIGHT - 100, CANVAS_WIDTH, 40);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+  ctx.fillRect(100, CANVAS_HEIGHT - 100, CANVAS_WIDTH, 40);
+  ctx.strokeStyle = '#f1c40f'; ctx.lineWidth = 4;
+  ctx.strokeRect(100, CANVAS_HEIGHT - 100, CANVAS_WIDTH, 40);
 };

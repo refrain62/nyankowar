@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
-import { playGashi, playCannon } from '../audio/se/battle';
+import { playGashi, playCannonCharge, playCannonExplosion } from '../audio/se/battle';
 import { playCharin, playUpgrade } from '../audio/se/system';
 import { playBgmStep } from '../audio/music/bgm';
 import { playVictory, playDefeat } from '../audio/music/jingles';
@@ -7,16 +7,12 @@ import { playVictory, playDefeat } from '../audio/music/jingles';
 // ブラウザ全体で共有するシングルトンAudioContext
 let globalAudioCtx: AudioContext | null = null;
 
-/**
- * ゲームのサウンドシステムを一括管理するフック
- */
 export const useGameAudio = () => {
   const bgmTimeoutRef = useRef<number | null>(null);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const isAudioEnabledRef = useRef(true);
   const currentStageIdRef = useRef<number>(1);
 
-  // 設定をRefに同期
   useEffect(() => { isAudioEnabledRef.current = isAudioEnabled; }, [isAudioEnabled]);
 
   const getCtx = useCallback(() => {
@@ -28,7 +24,6 @@ export const useGameAudio = () => {
     return globalAudioCtx;
   }, []);
 
-  // BGMを完全に停止
   const stopBGM = useCallback(() => {
     if (bgmTimeoutRef.current !== null) {
       window.clearTimeout(bgmTimeoutRef.current);
@@ -36,27 +31,21 @@ export const useGameAudio = () => {
     }
   }, []);
 
-  // BGM開始
   const startBGM = useCallback((stageId: number) => {
     stopBGM(); 
     currentStageIdRef.current = stageId;
     getCtx();
     let step = 0;
-
     const playNextNote = () => {
       if (bgmTimeoutRef.current === null) return;
-
       if (isAudioEnabledRef.current && globalAudioCtx?.state === 'running') {
         playBgmStep(globalAudioCtx, currentStageIdRef.current, step++);
       }
-      
       bgmTimeoutRef.current = window.setTimeout(playNextNote, 400);
     };
-
     bgmTimeoutRef.current = window.setTimeout(playNextNote, 0);
   }, [getCtx, stopBGM]);
 
-  // 効果音再生用の汎用関数
   const playOscDirect = useCallback((f: number, type: OscillatorType, dur: number, vol: number) => {
     if (!isAudioEnabledRef.current) return;
     const ctx = getCtx();
@@ -68,7 +57,6 @@ export const useGameAudio = () => {
     o.start(now); o.stop(now + dur);
   }, [getCtx]);
 
-  // 外部へ提供するAPI
   return useMemo(() => ({
     isAudioEnabled,
     setIsAudioEnabled,
@@ -79,7 +67,8 @@ export const useGameAudio = () => {
     playCharinSound: () => { if (isAudioEnabledRef.current) playCharin(getCtx()); },
     playUpgradeSound: () => { if (isAudioEnabledRef.current) playUpgrade(getCtx()); },
     playGashiSound: () => { if (isAudioEnabledRef.current) playGashi(getCtx()); },
-    playCannonSound: () => { if (isAudioEnabledRef.current) playCannon(getCtx()); },
+    playCannonChargeSound: () => { if (isAudioEnabledRef.current) playCannonCharge(getCtx()); },
+    playCannonExplosionSound: () => { if (isAudioEnabledRef.current) playCannonExplosion(getCtx()); },
     playVictoryFanfare: () => { if (isAudioEnabledRef.current) playVictory(getCtx()); },
     playDefeatJingle: () => { if (isAudioEnabledRef.current) playDefeat(getCtx()); }
   }), [isAudioEnabled, getCtx, startBGM, stopBGM, playOscDirect]);

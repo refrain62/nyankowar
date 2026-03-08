@@ -17,5 +17,5 @@ export const UNIT_TYPES: Record<string, UnitStats> = {
   ENEMY: { name: 'わんこ', cost: 0, hp: 150, speed: 0.8, damage: 25, color: '#5d6d7e', cooldown: 0, radius: 18, range: 50 },
   HIPPO: { name: 'カバちゃん', cost: 0, hp: 350, speed: 0.5, damage: 50, color: '#e6b0aa', cooldown: 0, radius: 28, range: 60 },
   SNAKE: { name: 'へび', cost: 0, hp: 80, speed: 1.5, damage: 15, color: '#abebc6', cooldown: 0, radius: 12, range: 40 },
-  BEAR: { name: 'くま', cost: 0, hp: 800, speed: 0.4, damage: 150, color: '#a04000', cooldown: 0, radius: 35, range: 80 },
+  BEAR: { name: 'くま', cost: 0, hp: 600, speed: 0.45, damage: 80, color: '#a04000', cooldown: 0, radius: 35, range: 80 },
 };
