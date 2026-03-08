@@ -19,7 +19,6 @@ export const playGashi = (ctx: AudioContext) => {
  * にゃんこ砲発射音
  */
 export const playCannon = (ctx: AudioContext) => {
-  const now = ctx.currentTime;
   // ウィィィンという充填
   playOsc(ctx, { freq: 100, type: 'sawtooth', dur: 0.5, vol: 0.1, endFreq: 800 });
   // ドォォォンという爆発

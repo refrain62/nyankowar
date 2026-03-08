@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { type Unit, type UnitStats, type StageConfig, CANVAS_WIDTH, CANVAS_HEIGHT } from '../types/game';
+import { type Unit, type StageConfig, CANVAS_WIDTH, CANVAS_HEIGHT } from '../types/game';
 import { UNIT_TYPES } from '../constants/units';
 import { STAGES } from '../constants/stages';
 import { useGameAudio } from '../hooks/useGameAudio';

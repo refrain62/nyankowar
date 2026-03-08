@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { playGashi, playCannon } from '../audio/se/battle';
-import { playSpawn, playCharin, playUpgrade } from '../audio/se/system';
+import { playCharin, playUpgrade } from '../audio/se/system';
 import { playBgmStep } from '../audio/music/bgm';
 import { playVictory, playDefeat } from '../audio/music/jingles';
 
@@ -40,14 +40,13 @@ export const useGameAudio = () => {
   const startBGM = useCallback((stageId: number) => {
     stopBGM(); 
     currentStageIdRef.current = stageId;
-    const ctx = getCtx();
+    getCtx();
     let step = 0;
 
     const playNextNote = () => {
       if (bgmTimeoutRef.current === null) return;
 
       if (isAudioEnabledRef.current && globalAudioCtx?.state === 'running') {
-        // インポートした関数を直接呼び出す
         playBgmStep(globalAudioCtx, currentStageIdRef.current, step++);
       }
       

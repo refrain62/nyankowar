@@ -4,8 +4,7 @@ import { playOsc } from '../core/player';
  * 勝利ファンファーレ
  */
 export const playVictory = (ctx: AudioContext) => {
-  const now = ctx.currentTime;
-  [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+  [523.25, 659.25, 783.99, 1046.50].forEach((f) => {
     playOsc(ctx, { freq: f, type: 'square', dur: 0.4, vol: 0.05 });
   });
 };
@@ -14,8 +13,7 @@ export const playVictory = (ctx: AudioContext) => {
  * 敗北ジングル
  */
 export const playDefeat = (ctx: AudioContext) => {
-  const now = ctx.currentTime;
-  [261.63, 233.08, 207.65, 196.00].forEach((f, i) => {
+  [261.63, 233.08, 207.65, 196.00].forEach((f) => {
     playOsc(ctx, { freq: f, type: 'sawtooth', dur: 0.6, vol: 0.05 });
   });
 };
