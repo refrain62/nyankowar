@@ -1,43 +1,45 @@
 import { CANVAS_HEIGHT } from '../../../types/game';
 
 /**
- * お城（拠点）を描画する関数
+ * 拠点の城を描画する関数
  */
-export const drawCastle = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  baseColor: string,
-  flagColor: string
-) => {
+export const drawCastle = (ctx: CanvasRenderingContext2D, x: number, bodyColor: string, flagColor: string) => {
+  const groundY = CANVAS_HEIGHT - 55; // 地面の高さに合わせる
+
   ctx.save();
-  
-  // メインの塔
-  ctx.fillStyle = baseColor;
-  ctx.fillRect(x, CANVAS_HEIGHT - 150, 80, 100);
-  
-  // 門
-  ctx.fillStyle = '#333';
-  ctx.fillRect(x + 25, CANVAS_HEIGHT - 90, 30, 40);
-  
-  // 屋根
-  ctx.fillStyle = baseColor;
+  ctx.translate(x, groundY);
+
+  // 1. 土台
+  ctx.fillStyle = bodyColor;
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(x - 10, CANVAS_HEIGHT - 150);
-  ctx.lineTo(x + 40, CANVAS_HEIGHT - 200);
-  ctx.lineTo(x + 90, CANVAS_HEIGHT - 150);
+  ctx.roundRect(0, -80, 80, 80, [10, 10, 0, 0]);
+  ctx.fill(); ctx.stroke();
+
+  // 2. 屋上の凸凹
+  for (let i = 0; i < 3; i++) {
+    ctx.fillRect(5 + i * 25, -95, 15, 15);
+    ctx.strokeRect(5 + i * 25, -95, 15, 15);
+  }
+
+  // 3. 門
+  ctx.fillStyle = '#2c3e50';
+  ctx.beginPath();
+  ctx.roundRect(20, -40, 40, 40, [20, 20, 0, 0]);
   ctx.fill();
-  
-  // 旗竿
+
+  // 4. 旗
   ctx.strokeStyle = '#333';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(x + 40, CANVAS_HEIGHT - 200);
-  ctx.lineTo(x + 40, CANVAS_HEIGHT - 230);
+  ctx.moveTo(10, -80); ctx.lineTo(10, -130);
   ctx.stroke();
   
-  // なびく旗
   ctx.fillStyle = flagColor;
-  ctx.fillRect(x + 40, CANVAS_HEIGHT - 230, 30, 20);
-  
+  ctx.beginPath();
+  ctx.moveTo(10, -130); ctx.lineTo(40, -120); ctx.lineTo(10, -110);
+  ctx.fill(); ctx.stroke();
+
   ctx.restore();
 };

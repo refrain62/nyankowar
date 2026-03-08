@@ -2,7 +2,7 @@
  * ゲームの基本定数
  */
 export const CANVAS_WIDTH = 800;
-export const CANVAS_HEIGHT = 400;
+export const CANVAS_HEIGHT = 340; // 450 * 3/4 (approx)
 
 /**
  * ユニットの基本性能を定義
