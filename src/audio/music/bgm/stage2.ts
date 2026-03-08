@@ -1,8 +1,12 @@
 import { playOsc } from '../../core/player';
 
+/**
+ * 第2章: 夕暮れの平原
+ * ゆったりとしたサイン波の哀愁漂うメロディ
+ */
 export const playStage2 = (ctx: AudioContext, step: number) => {
-  // 2ステップに1回だけ鳴らすことでゆったりさせる
+  // 2拍に1回だけ鳴らす
   if (step % 2 !== 0) return;
-  const notes = [220.00, 261.63, 196.00, 220.00]; // A3, C4, G3, A3
-  playOsc(ctx, { freq: notes[(step / 2) % 4], type: 'sine', dur: 0.8, vol: 0.06 });
+  const notes = [220.00, 261.63, 329.63, 293.66]; // A3, C4, E4, D4
+  playOsc(ctx, { freq: notes[(step / 2) % 4], type: 'sine', dur: 0.7, vol: 0.06 });
 };

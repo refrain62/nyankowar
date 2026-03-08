@@ -5,14 +5,24 @@ import { playStage4 } from './bgm/stage4';
 
 /**
  * ステージに応じたBGMの1ステップを再生
- * ステージごとに異なるファイル（ロジック）を呼び出します。
+ * 
+ * 各ステージの専門ファイルから再生ロジックを呼び出します。
  */
 export const playBgmStep = (ctx: AudioContext, stageId: number, step: number) => {
   switch (stageId) {
-    case 1: playStage1(ctx, step); break;
-    case 2: playStage2(ctx, step); break;
-    case 3: playStage3(ctx, step); break;
-    case 4: playStage4(ctx, step); break;
-    default: playStage1(ctx, step);
+    case 1:
+      playStage1(ctx, step);
+      break;
+    case 2:
+      playStage2(ctx, step);
+      break;
+    case 3:
+      playStage3(ctx, step);
+      break;
+    case 4:
+      playStage4(ctx, step);
+      break;
+    default:
+      playStage1(ctx, step);
   }
 };
