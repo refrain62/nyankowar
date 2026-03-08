@@ -1,14 +1,18 @@
-import { playOsc } from '../core/player';
+import { playStage1 } from './bgm/stage1';
+import { playStage2 } from './bgm/stage2';
+import { playStage3 } from './bgm/stage3';
+import { playStage4 } from './bgm/stage4';
 
 /**
- * BGMの1ステップを再生
+ * ステージに応じたBGMの1ステップを再生
+ * ステージごとに異なるファイル（ロジック）を呼び出します。
  */
-export const playBgmStep = (ctx: AudioContext, step: number) => {
-  const notes = [261.63, 329.63, 392.00, 349.23]; // C, E, G, F
-  playOsc(ctx, {
-    freq: notes[step % 4],
-    type: 'triangle',
-    dur: 0.35,
-    vol: 0.02
-  });
+export const playBgmStep = (ctx: AudioContext, stageId: number, step: number) => {
+  switch (stageId) {
+    case 1: playStage1(ctx, step); break;
+    case 2: playStage2(ctx, step); break;
+    case 3: playStage3(ctx, step); break;
+    case 4: playStage4(ctx, step); break;
+    default: playStage1(ctx, step);
+  }
 };

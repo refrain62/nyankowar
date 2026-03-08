@@ -39,7 +39,7 @@ const Game: React.FC = () => {
     setCurrentStage(stage);
     currentStageRef.current = stage;
     audio.initAudio();
-    audio.startBGM();
+    audio.startBGM(stage.id);
     const s = stateRef.current;
     s.baseHp = stage.baseHp; s.enemyBaseHp = stage.enemyBaseHp;
     s.money = 0; s.walletLevel = 1; s.units = []; s.cannonCharge = 0;

@@ -6,9 +6,6 @@ import * as Jingles from '../audio/music/jingles';
 
 let globalAudioCtx: AudioContext | null = null;
 
-/**
- * ゲームのサウンドシステムを一括管理するフック
- */
 export const useGameAudio = () => {
   const bgmTimerRef = useRef<number | null>(null);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
@@ -32,13 +29,13 @@ export const useGameAudio = () => {
     }
   }, []);
 
-  const startBGM = useCallback(() => {
+  const startBGM = useCallback((stageId: number) => {
     stopBGM();
     const ctx = getCtx();
     let step = 0;
     const playNext = () => {
       if (isAudioEnabledRef.current && globalAudioCtx?.state === 'running') {
-        BgmMusic.playBgmStep(globalAudioCtx, step++);
+        BgmMusic.playBgmStep(globalAudioCtx, stageId, step++);
       }
       bgmTimerRef.current = window.setTimeout(playNext, 400);
     };
