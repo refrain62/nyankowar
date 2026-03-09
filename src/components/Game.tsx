@@ -32,18 +32,36 @@ const Game: React.FC = () => {
   /**
    * 【設計意図】有限状態マシン (FSM) による遷移管理。
    * ゲームの状態変更と、それに伴う副作用（BGMの停止など）を一元管理します。
-   * useEffect で「状態の同期」を行うのではなく、この関数を「イベント」として呼ぶことで、
-   * 命令的で予測可能な状態管理を実現します。
    */
-  const transitionTo = useCallback((nextState: typeof stateRef.current.gameState) => {
+  const transitionTo = useCallback((nextState: 'title' | 'start' | 'playing' | 'victory' | 'defeat' | 'paused') => {
+    const prevState = stateRef.current.gameState;
     stateRef.current.gameState = nextState;
     setUi(prev => ({ ...prev, gameState: nextState }));
     
-    // 状態遷移に伴う副作用の一元管理
+    // 状態遷移に伴うオーディオ副作用の管理
     if (nextState === 'start' || nextState === 'title') {
       audio.stopBGM();
+    } else if (nextState === 'paused') {
+      audio.pauseBGM();
+    } else if (nextState === 'playing' && prevState === 'paused') {
+      audio.resumeBGM();
     }
   }, [audio]);
+
+  const togglePause = useCallback(() => {
+    const s = stateRef.current;
+    if (s.gameState === 'playing') transitionTo('paused');
+    else if (s.gameState === 'paused') transitionTo('playing');
+  }, [transitionTo]);
+
+  // キーボードショートカット (Pキーでポーズ)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'KeyP') togglePause();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [togglePause]);
 
   const toStageSelect = () => { 
     audio.initAudio(); 
@@ -130,7 +148,18 @@ const Game: React.FC = () => {
           </div>
         )}
 
-        {ui.gameState === 'playing' && ( <button onClick={backToMenu} style={{ position: 'absolute', top: '10px', right: '10px', padding: '5px 15px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '12px' }}>メニューへ戻る</button> )}
+        {ui.gameState === 'playing' && ( 
+          <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '5px' }}>
+            <button onClick={togglePause} style={{ padding: '5px 15px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '12px' }}>PAUSE</button>
+            <button onClick={backToMenu} style={{ padding: '5px 15px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '12px' }}>メニューへ戻る</button> 
+          </div>
+        )}
+        {ui.gameState === 'paused' && (
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderRadius: '12px' }}>
+            <h2 style={{ fontSize: '40px', marginBottom: '20px' }}>PAUSED</h2>
+            <button onClick={togglePause} style={{ padding: '10px 30px', fontSize: '20px', cursor: 'pointer', borderRadius: '8px', background: '#2ecc71', color: '#fff', border: 'none', fontWeight: 'bold' }}>RESUME</button>
+          </div>
+        )}
         {(ui.gameState === 'victory' || ui.gameState === 'defeat') && (
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.7)', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderRadius: '12px' }}>
             <h2 style={{ fontSize: '60px', color: ui.gameState === 'victory' ? '#f1c40f' : '#e74c3c' }}>{ui.gameState.toUpperCase()}</h2>

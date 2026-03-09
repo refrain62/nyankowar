@@ -4,18 +4,14 @@ import { playCharin, playUpgrade } from '../audio/se/system';
 import { playBgmStep } from '../audio/music/bgm';
 import { playVictory, playDefeat } from '../audio/music/jingles';
 
-// ブラウザ全体で共有するシングルトンAudioContext
 let globalAudioCtx: AudioContext | null = null;
 
-/**
- * ゲームのオーディオを管理するカスタムフック。
- * 状態の同期に useEffect を使わず、全てのメソッドを Stable (再生成されない) に保ちます。
- */
 export const useGameAudio = () => {
   const bgmTimeoutRef = useRef<number | null>(null);
   const [isAudioEnabled, _setIsAudioEnabled] = useState(true);
   const isAudioEnabledRef = useRef(true);
   const currentStageIdRef = useRef<number>(1);
+  const bgmStepRef = useRef<number>(0); // BGMの再生ステップを保持
 
   const getCtx = useCallback(() => {
     if (!globalAudioCtx) {
@@ -33,52 +29,54 @@ export const useGameAudio = () => {
     }
   }, []);
 
-  const startBGM = useCallback((stageId: number) => {
-    stopBGM(); 
-    currentStageIdRef.current = stageId;
-    getCtx();
-    let step = 0;
-    
-    // BGMの再生ループ (setTimeoutを使用)
+  // BGMの再生ループ（内部用）
+  const runBgmLoop = useCallback(() => {
     const playNextNote = () => {
-      // bgmTimeoutRef.current が null の場合は停止中とみなす
       if (bgmTimeoutRef.current === null) return;
-      
       if (isAudioEnabledRef.current && globalAudioCtx?.state === 'running') {
-        playBgmStep(globalAudioCtx, currentStageIdRef.current, step++);
+        playBgmStep(globalAudioCtx, currentStageIdRef.current, bgmStepRef.current++);
       }
       bgmTimeoutRef.current = window.setTimeout(playNextNote, 400);
     };
-
-    // ループ開始フラグとして適当な値をセット
     bgmTimeoutRef.current = 0;
     playNextNote();
-  }, [getCtx, stopBGM]);
+  }, []);
+
+  const startBGM = useCallback((stageId: number) => {
+    stopBGM(); 
+    currentStageIdRef.current = stageId;
+    bgmStepRef.current = 0; // 最初から再生
+    getCtx();
+    runBgmLoop();
+  }, [getCtx, stopBGM, runBgmLoop]);
+
+  const pauseBGM = useCallback(() => {
+    stopBGM(); // タイマーを止めるだけで stepRef は保持される
+  }, [stopBGM]);
+
+  const resumeBGM = useCallback(() => {
+    if (bgmTimeoutRef.current !== null) return; // 既に再生中なら何もしない
+    getCtx();
+    runBgmLoop(); // 現在の stepRef から再開
+  }, [getCtx, runBgmLoop]);
 
   const setIsAudioEnabled = useCallback((enabled: boolean) => {
     _setIsAudioEnabled(enabled);
     isAudioEnabledRef.current = enabled;
   }, []);
 
-  /**
-   * 【設計意図】アンマウント時にBGMを確実に停止するためのクリーンアップ。
-   * Reactの外部リソース（Web Audio API）を管理する際の、唯一の「正しいuseEffect」の使い道です。
-   */
   useEffect(() => {
     return () => stopBGM();
   }, [stopBGM]);
 
-  /**
-   * 【設計意図】返却されるオブジェクトの参照を完全に固定。
-   * これにより、利用側の useEffect(..., [audio]) や audioRef による同期が不要になります。
-   * ゲームループのような高頻度で更新されるロジックに渡すのに最適化されています。
-   */
   return useMemo(() => ({
     isAudioEnabled,
     setIsAudioEnabled,
     initAudio: getCtx,
     startBGM,
     stopBGM,
+    pauseBGM,
+    resumeBGM,
     playSystemSE: (f: number) => {
       if (!isAudioEnabledRef.current) return;
       const ctx = getCtx();
@@ -96,7 +94,7 @@ export const useGameAudio = () => {
     playCannonExplosionSound: () => { if (isAudioEnabledRef.current) playCannonExplosion(getCtx()); },
     playVictoryFanfare: () => { if (isAudioEnabledRef.current) playVictory(getCtx()); },
     playDefeatJingle: () => { if (isAudioEnabledRef.current) playDefeat(getCtx()); }
-  }), [isAudioEnabled, getCtx, startBGM, stopBGM, setIsAudioEnabled]);
+  }), [isAudioEnabled, getCtx, startBGM, stopBGM, pauseBGM, resumeBGM, setIsAudioEnabled]);
 };
 
 export type GameAudio = ReturnType<typeof useGameAudio>;
