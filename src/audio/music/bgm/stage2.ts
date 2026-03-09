@@ -10,8 +10,8 @@ export const playStage2 = (ctx: AudioContext, step: number) => {
 	if (step % 2 !== 0) return;
 
 	// マイナーコードの構成音 (A3, C4, E4, D4)
-	const notes = [220.0, 261.63, 329.63, 293.66]; 
-	
+	const notes = [220.0, 261.63, 329.63, 293.66];
+
 	playOsc(ctx, {
 		freq: notes[(step / 2) % 4],
 		type: "sine",

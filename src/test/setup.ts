@@ -48,5 +48,14 @@ function MockAudioContext() {
 
 const AudioContextSpy = vi.fn().mockImplementation(MockAudioContext);
 
-(globalThis as any).AudioContext = AudioContextSpy;
-(window as any).AudioContext = AudioContextSpy;
+// window オブジェクトに AudioContext を登録
+Object.defineProperty(window, "AudioContext", {
+	value: AudioContextSpy,
+	writable: true,
+});
+
+// global 空間にも必要であれば登録
+Object.defineProperty(globalThis, "AudioContext", {
+	value: AudioContextSpy,
+	writable: true,
+});

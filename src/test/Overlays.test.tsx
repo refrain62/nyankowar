@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { STAGES } from "../constants/stages";
 import { PauseOverlay } from "../components/UI/PauseOverlay";
 import { ResultOverlay } from "../components/UI/ResultOverlay";
 import { StageSelectOverlay } from "../components/UI/StageSelectOverlay";
+import { STAGES } from "../constants/stages";
 
 /**
  * 【責任】各オーバーレイUIのユーザーインタラクションと状態遷移の検証。

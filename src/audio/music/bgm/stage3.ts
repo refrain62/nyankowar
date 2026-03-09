@@ -7,14 +7,14 @@ import { playOsc } from "../../core/player";
  */
 export const playStage3 = (ctx: AudioContext, step: number) => {
 	// 重厚なベースライン (C3, D3, Eb3, C3)
-	const notes = [130.81, 146.83, 155.56, 130.81]; 
-	
+	const notes = [130.81, 146.83, 155.56, 130.81];
+
 	// 1. メインの重低音ベース
-	playOsc(ctx, { 
-		freq: notes[step % 4], 
-		type: "square", 
-		dur: 0.15, // 短く切って「刻み」を表現 
-		vol: 0.05 
+	playOsc(ctx, {
+		freq: notes[step % 4],
+		type: "square",
+		dur: 0.15, // 短く切って「刻み」を表現
+		vol: 0.05,
 	});
 
 	// 2. 裏拍のハイハット風エフェクト

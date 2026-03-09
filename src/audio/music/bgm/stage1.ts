@@ -7,8 +7,8 @@ import { playOsc } from "../../core/player";
  */
 export const playStage1 = (ctx: AudioContext, step: number) => {
 	// 基本的なメジャーコード (C, E, G, F) のアルペジオ
-	const notes = [261.63, 329.63, 392.0, 349.23]; 
-	
+	const notes = [261.63, 329.63, 392.0, 349.23];
+
 	playOsc(ctx, {
 		freq: notes[step % 4], // ステップごとに音階を循環
 		type: "triangle",

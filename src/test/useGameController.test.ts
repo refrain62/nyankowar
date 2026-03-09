@@ -1,21 +1,30 @@
 import { renderHook } from "@testing-library/react";
+import type { RefObject } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { STAGES } from "../constants/stages";
+import type { GameAudio } from "../hooks/useGameAudio";
 import { useGameController } from "../hooks/useGameController";
-import type { GameState } from "../types/game";
+import type { GameState, StageConfig } from "../types/game";
 
 describe("useGameController", () => {
+	// GameAudio の全メソッドをモック化し、型安全性を確保
 	const mockAudio = {
+		isAudioEnabled: true,
+		setIsAudioEnabled: vi.fn(),
 		initAudio: vi.fn(),
 		startBGM: vi.fn(),
 		stopBGM: vi.fn(),
 		pauseBGM: vi.fn(),
 		resumeBGM: vi.fn(),
 		playSystemSE: vi.fn(),
+		playCharinSound: vi.fn(),
 		playUpgradeSound: vi.fn(),
+		playGashiSound: vi.fn(),
 		playCannonChargeSound: vi.fn(),
 		playCannonExplosionSound: vi.fn(),
-	} as any;
+		playVictoryFanfare: vi.fn(),
+		playDefeatJingle: vi.fn(),
+	} as unknown as GameAudio;
 
 	const createInitialState = (): GameState => ({
 		money: 500,
@@ -37,19 +46,19 @@ describe("useGameController", () => {
 
 	const setup = () => {
 		const state = createInitialState();
-		const stateRef = { current: state };
+		const stateRef = { current: state } as RefObject<GameState>;
 		const setUi = vi.fn();
 		const setCurrentStage = vi.fn();
-		const currentStageRef = { current: STAGES[1] };
+		const currentStageRef = { current: STAGES[1] } as RefObject<StageConfig>;
 
 		const { result } = renderHook(() =>
 			useGameController(
-				stateRef as any,
+				stateRef,
 				mockAudio,
 				setUi,
 				STAGES[1],
 				setCurrentStage,
-				currentStageRef as any,
+				currentStageRef,
 			),
 		);
 
@@ -85,7 +94,7 @@ describe("useGameController", () => {
 
 	it("handleCannon: チャージが100%の時のみ発動し、直後に isCannonCharging が true になること", () => {
 		const { controller, state } = setup();
-		
+
 		// チャージ不足 (99%)
 		state.cannonCharge = 99;
 		controller.handleCannon();
@@ -95,7 +104,7 @@ describe("useGameController", () => {
 		state.cannonCharge = 100;
 		controller.handleCannon();
 		expect(state.isCannonCharging).toBe(true); // 充填開始
-		expect(state.isCannonFiring).toBe(false);   // まだ発射されていない
+		expect(state.isCannonFiring).toBe(false); // まだ発射されていない
 		expect(state.cannonCharge).toBe(0); // 数値はリセット
 	});
 });

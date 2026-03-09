@@ -49,20 +49,20 @@ export const drawBackground = (
 	// 4. 地面 (最前面。芝生と土の2層構造)
 	// 芝生 (上層)
 	ctx.fillStyle = bg.grass;
-	ctx.fillRect(0, CANVAS_HEIGHT - 55, CANVAS_WIDTH, 8); 
+	ctx.fillRect(0, CANVAS_HEIGHT - 55, CANVAS_WIDTH, 8);
 	// 土 (下層)
 	ctx.fillStyle = bg.dirt;
-	ctx.fillRect(0, CANVAS_HEIGHT - 47, CANVAS_WIDTH, 47); 
+	ctx.fillRect(0, CANVAS_HEIGHT - 47, CANVAS_WIDTH, 47);
 
 	// 5. 流れる雲 (半透明の複数の円を組み合わせて「もくもく感」を出す)
 	const cloudOffset = (timestamp / 30) % (CANVAS_WIDTH + 200);
 	ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-	
+
 	const drawCloud = (x: number, y: number) => {
 		ctx.beginPath();
-		ctx.arc(x, y, 20, 0, Math.PI * 2);           // 左の塊
+		ctx.arc(x, y, 20, 0, Math.PI * 2); // 左の塊
 		ctx.arc(x + 25, y - 10, 25, 0, Math.PI * 2); // 中央の大きな塊
-		ctx.arc(x + 50, y, 20, 0, Math.PI * 2);      // 右の塊
+		ctx.arc(x + 50, y, 20, 0, Math.PI * 2); // 右の塊
 		ctx.fill();
 	};
 

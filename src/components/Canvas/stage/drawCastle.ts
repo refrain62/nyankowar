@@ -20,7 +20,7 @@ export const drawCastle = (
 	ctx.strokeStyle = "#333";
 	ctx.lineWidth = 3;
 	ctx.beginPath();
-	// 角丸設定の配列 [左上, 右上, 右下, 左下] 
+	// 角丸設定の配列 [左上, 右上, 右下, 左下]
 	// 接地面（下側）は角を丸めず、屋根側（上側）のみ丸める。
 	ctx.roundRect(0, -80, 80, 80, [10, 10, 0, 0]);
 	ctx.fill();

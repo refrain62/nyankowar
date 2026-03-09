@@ -22,7 +22,7 @@
     - 「AudioContext.state がユーザーの初回の操作（Click）後に 'running' に遷移していること」
 
 ### ④ 型安全性と CI/CD (Type Safety & CI/CD)
-- **厳格な型定義:** `any` の使用を極力排除し、`RefObject` などの React Hooks における Null 安全性を型レベルで保証。
+- **厳格な型定義:** `any` の使用を完全に排除。React Hooks における `RefObject` や、カスタムフックの戻り値型（`GameAudio` など）をテストコードを含めて一貫して適用し、Null 安全性と型推論を最大化。
 - **CI 自動検証パイプライン:** GitHub Actions により、`push` および `pull_request` ごとに `Lint` (Biome) と `Unit Test` (Vitest) を個別ジョブとして実行。
 - **ビルドの不変性:** `Lint` および `Test` ジョブがすべてパスした場合にのみ `Production Build` を実行し、デプロイ品質を 100% 維持。
 

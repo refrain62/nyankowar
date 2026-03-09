@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import { STAGES } from "../constants/stages";
+import type { GameAudio } from "../hooks/useGameAudio";
 import {
 	processUnitsAndCombat,
-	spawnEnemies,
 	updateCooldowns,
 	updateEconomy,
 } from "../logic/gameSystems";
-import { CANVAS_WIDTH, type GameState } from "../types/game";
+import { CANVAS_WIDTH, type GameState, type UnitStats } from "../types/game";
 
 /**
  * 【責任】ゲームコアロジック（経済、戦闘、クールダウン、敵生成）の定量的検証。
@@ -19,7 +19,7 @@ describe("gameSystems", () => {
 		stopBGM: vi.fn(),
 		playVictoryFanfare: vi.fn(),
 		playDefeatJingle: vi.fn(),
-	} as any;
+	} as unknown as GameAudio;
 
 	const createInitialState = (): GameState => ({
 		money: 0,
@@ -90,7 +90,17 @@ describe("gameSystems", () => {
 				y: 0,
 				type: "ally",
 				unitType: "BASIC",
-				stats: { range: 100, speed: 1, damage: 10, hp: 100 } as any,
+				stats: {
+					range: 100,
+					speed: 1,
+					damage: 10,
+					hp: 100,
+					name: "Basic",
+					cost: 50,
+					color: "white",
+					cooldown: 1000,
+					radius: 10,
+				} as UnitStats,
 				currentHp: 100,
 			},
 		];
@@ -101,7 +111,17 @@ describe("gameSystems", () => {
 				y: 0,
 				type: "enemy",
 				unitType: "ENEMY",
-				stats: { range: 100, speed: 0, damage: 10, hp: 100 } as any,
+				stats: {
+					range: 100,
+					speed: 0,
+					damage: 10,
+					hp: 100,
+					name: "Enemy",
+					cost: 0,
+					color: "red",
+					cooldown: 0,
+					radius: 10,
+				} as UnitStats,
 				currentHp: 100,
 			},
 		];
@@ -124,7 +144,17 @@ describe("gameSystems", () => {
 				y: 0,
 				type: "ally",
 				unitType: "BASIC",
-				stats: { range: 100, speed: 1, damage: 10, hp: 100 } as any,
+				stats: {
+					range: 100,
+					speed: 1,
+					damage: 10,
+					hp: 100,
+					name: "Basic",
+					cost: 50,
+					color: "white",
+					cooldown: 1000,
+					radius: 10,
+				} as UnitStats,
 				currentHp: 100,
 			},
 		];
@@ -135,7 +165,17 @@ describe("gameSystems", () => {
 				y: 0,
 				type: "enemy",
 				unitType: "ENEMY",
-				stats: { range: 100, speed: 0, damage: 10, hp: 100 } as any,
+				stats: {
+					range: 100,
+					speed: 0,
+					damage: 10,
+					hp: 100,
+					name: "Enemy",
+					cost: 0,
+					color: "red",
+					cooldown: 0,
+					radius: 10,
+				} as UnitStats,
 				currentHp: 100,
 			},
 		];
@@ -158,7 +198,17 @@ describe("gameSystems", () => {
 				y: 0,
 				type: "ally",
 				unitType: "BASIC",
-				stats: { range: 100, speed: 1, damage: 10, hp: 100 } as any,
+				stats: {
+					range: 100,
+					speed: 1,
+					damage: 10,
+					hp: 100,
+					name: "Basic",
+					cost: 50,
+					color: "white",
+					cooldown: 1000,
+					radius: 10,
+				} as UnitStats,
 				currentHp: 100,
 			},
 		];

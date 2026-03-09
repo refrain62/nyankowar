@@ -13,7 +13,7 @@ describe("GaugeButton", () => {
 	 */
 	/**
 	 * 背景グラデーション（ゲージの高さ）の CSS 検証。
-	 * 期待値: 
+	 * 期待値:
 	 * 1. percent=30 のとき、background プロパティが 'linear-gradient(to top, blue 30%, rgb(149, 165, 166) 30%)' と一致すること。
 	 * 2. percent=100 のとき、background プロパティが readyColor ('green') と一致すること。
 	 */
@@ -32,7 +32,9 @@ describe("GaugeButton", () => {
 
 		const button = screen.getByRole("button");
 		// JSDOMは #95a5a6 を rgb(149, 165, 166) に変換するため、rgb表記で検証
-		expect(button.style.background).toBe("linear-gradient(to top, blue 30%, rgb(149, 165, 166) 30%)");
+		expect(button.style.background).toBe(
+			"linear-gradient(to top, blue 30%, rgb(149, 165, 166) 30%)",
+		);
 	});
 
 	it("percent=100のとき、背景が単色の readyColor ('green') に切り替わること", () => {
@@ -54,7 +56,7 @@ describe("GaugeButton", () => {
 
 	/**
 	 * disabled 時のクリック防止検証。
-	 * 期待値: 
+	 * 期待値:
 	 * 1. button 要素に disabled 属性が付与されていること。
 	 * 2. クリックイベントを発火させても、onClick コールバックが 0回呼び出されること。
 	 */
@@ -80,7 +82,7 @@ describe("GaugeButton", () => {
 
 	/**
 	 * 準備完了時のクリック検証。
-	 * 期待値: 
+	 * 期待値:
 	 * 1. button 要素に disabled 属性が付与されていないこと。
 	 * 2. クリックイベントを発火させた際に、onClick コールバックが 1回呼び出されること。
 	 */
