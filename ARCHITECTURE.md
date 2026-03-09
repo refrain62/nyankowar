@@ -10,9 +10,10 @@
 
 ### ① ロジックの検証 (Vitest + React Testing Library)
 - **期待値の定義例:**
-    - 「updateEconomyを実行後、所持金が (基本給30 + Lv*20) * dt 分増加し、125 と一致すること」
+    - 「updateEconomyを実行後、0.5秒間で所持金が正確に (30 + Lv*20) * 0.5 円増加していること」
+    - 「射程 100px のとき、距離 100.1px では 1px 移動し、99.9px では座標変化量が 0 になること」
+    - 「GaugeButton の percent=30 のとき、background CSS が正確に 30% の位置で色相変化していること」
     - 「HPが0以下になった瞬間、ユニット配列から該当IDが削除され、lengthが1減少すること」
-    - 「ボタンクリック後、onSelectStage が引数 STAGES[1] で 1回呼び出されること」
 
 ### ③ 実機挙動の検証 (Playwright)
 - **期待値の定義例:**

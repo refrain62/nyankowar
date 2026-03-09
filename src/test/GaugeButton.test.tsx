@@ -11,11 +11,17 @@ describe("GaugeButton", () => {
 	 * percent 引数による表示検証。
 	 * 期待値: 指定されたラベル "Test Button" がドキュメント内に 1つ存在すること。
 	 */
-	it("percent=50を与えた際に、指定されたラベル 'Test Button' が描画されていること", () => {
+	/**
+	 * 背景グラデーション（ゲージの高さ）の CSS 検証。
+	 * 期待値: 
+	 * 1. percent=30 のとき、background プロパティが 'linear-gradient(to top, blue 30%, rgb(149, 165, 166) 30%)' と一致すること。
+	 * 2. percent=100 のとき、background プロパティが readyColor ('green') と一致すること。
+	 */
+	it("percent=30のとき、背景グラデーションのCSSが正確に30%の高さで描画されていること", () => {
 		render(
 			<GaugeButton
-				label="Test Button"
-				percent={50}
+				label="30% Button"
+				percent={30}
 				onClick={() => {}}
 				disabled={false}
 				readyColor="green"
@@ -24,8 +30,26 @@ describe("GaugeButton", () => {
 			/>,
 		);
 
-		const label = screen.getByText("Test Button");
-		expect(label).toBeInTheDocument();
+		const button = screen.getByRole("button");
+		// JSDOMは #95a5a6 を rgb(149, 165, 166) に変換するため、rgb表記で検証
+		expect(button.style.background).toBe("linear-gradient(to top, blue 30%, rgb(149, 165, 166) 30%)");
+	});
+
+	it("percent=100のとき、背景が単色の readyColor ('green') に切り替わること", () => {
+		render(
+			<GaugeButton
+				label="100% Button"
+				percent={100}
+				onClick={() => {}}
+				disabled={false}
+				readyColor="green"
+				gaugeColor="blue"
+				width="100px"
+			/>,
+		);
+
+		const button = screen.getByRole("button");
+		expect(button.style.background).toBe("green");
 	});
 
 	/**

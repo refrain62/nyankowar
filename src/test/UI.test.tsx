@@ -23,15 +23,15 @@ describe("UI Components", () => {
 	 * 操作パネルの資金不足による制限の検証。
 	 * 期待値: 所持金が 0 の状態で、召喚コスト $50 または アップグレードコスト $200 のボタンが disabled であること。
 	 */
-	it("ControlPanel: 所持金が0の場合、召喚ボタン($50)およびアップグレードボタン($200)が非活性状態(disabled)になること", () => {
+	/**
+	 * 所持金がちょうど足りる境界値の検証。
+	 * 期待値: 所持金が 50 のとき、コスト 50 の BASIC ボタンが活性状態(enabled)になり、1回クリックできること。
+	 */
+	it("ControlPanel: 所持金がちょうど50の場合、コスト50のBASICボタンが活性状態(enabled)になること", () => {
 		const onSpawn = vi.fn();
-		const onUpgrade = vi.fn();
-		const onCannon = vi.fn();
 		const mockUi = {
-			money: 0, // 資金不足の状態をモック
+			money: 50,
 			walletLevel: 1,
-			baseHp: 1000,
-			enemyBaseHp: 1000,
 			cannonCharge: 0,
 			gameState: "play",
 			cooldownPercents: { BASIC: 100 },
@@ -41,16 +41,65 @@ describe("UI Components", () => {
 			<ControlPanel
 				ui={mockUi}
 				onSpawn={onSpawn}
-				onUpgrade={onUpgrade}
-				onCannon={onCannon}
+				onUpgrade={() => {}}
+				onCannon={() => {}}
 			/>,
 		);
 
-		// BASICボタン（$50）は資金不足のため非活性
+		const spawnButton = screen.getByText(/\$50/).closest("button");
+		expect(spawnButton).not.toBeDisabled();
+		fireEvent.click(spawnButton!);
+		expect(onSpawn).toHaveBeenCalledWith("BASIC");
+	});
+
+	/**
+	 * クールダウン中の制限検証。
+	 * 期待値: 所持金が 1000 あっても、クールダウンが 99% のときはボタンが非活性状態(disabled)になること。
+	 */
+	it("ControlPanel: 所持金が十分あっても、クールダウンが99%のときはボタンが非活性状態(disabled)になること", () => {
+		const mockUi = {
+			money: 1000,
+			walletLevel: 1,
+			cannonCharge: 0,
+			gameState: "play",
+			cooldownPercents: { BASIC: 99 },
+		} as any;
+
+		render(
+			<ControlPanel
+				ui={mockUi}
+				onSpawn={() => {}}
+				onUpgrade={() => {}}
+				onCannon={() => {}}
+			/>,
+		);
+
 		const spawnButton = screen.getByText(/\$50/).closest("button");
 		expect(spawnButton).toBeDisabled();
+	});
 
-		// アップグレードボタン（$200）も資金不足のため非活性
+	/**
+	 * アップグレード上限の検証。
+	 * 期待値: walletLevel が 8（最大）のとき、所持金に関わらずアップグレードボタンが非活性状態(disabled)になること。
+	 */
+	it("ControlPanel: 働きネコのレベルが8の場合、所持金に関わらずボタンが非活性状態(disabled)になること", () => {
+		const mockUi = {
+			money: 10000,
+			walletLevel: 8,
+			cannonCharge: 0,
+			gameState: "play",
+			cooldownPercents: { BASIC: 100 },
+		} as any;
+
+		render(
+			<ControlPanel
+				ui={mockUi}
+				onSpawn={() => {}}
+				onUpgrade={() => {}}
+				onCannon={() => {}}
+			/>,
+		);
+
 		const upgradeButton = screen.getByText(/働きネコ/).closest("button");
 		expect(upgradeButton).toBeDisabled();
 	});
