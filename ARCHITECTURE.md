@@ -23,7 +23,8 @@
 
 ### ④ 型安全性と CI/CD (Type Safety & CI/CD)
 - **厳格な型定義:** `any` の使用を極力排除し、`RefObject` などの React Hooks における Null 安全性を型レベルで保証。
-- **ビルドの不変性:** 環境に依存せず、常に `tsc -b && vite build` が 0 エラーで完了することを CI 上で保証し、デプロイ後のランタイムエラーを未然に防止。
+- **CI 自動検証パイプライン:** GitHub Actions により、`push` および `pull_request` ごとに `Lint` (Biome) と `Unit Test` (Vitest) を個別ジョブとして実行。
+- **ビルドの不変性:** `Lint` および `Test` ジョブがすべてパスした場合にのみ `Production Build` を実行し、デプロイ品質を 100% 維持。
 
 ## 2. 責任の分離 (Separation of Concerns)
 - **View Layer**: Playwright によるピクセル・状態遷移検証の対象。
