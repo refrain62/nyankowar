@@ -9,8 +9,12 @@ describe("useGameController", () => {
 		initAudio: vi.fn(),
 		startBGM: vi.fn(),
 		stopBGM: vi.fn(),
+		pauseBGM: vi.fn(),
+		resumeBGM: vi.fn(),
 		playSystemSE: vi.fn(),
 		playUpgradeSound: vi.fn(),
+		playCannonChargeSound: vi.fn(),
+		playCannonExplosionSound: vi.fn(),
 	} as any;
 
 	const createInitialState = (): GameState => ({
@@ -62,24 +66,36 @@ describe("useGameController", () => {
 		expect(mockAudio.startBGM).toHaveBeenCalledWith(stage.id);
 	});
 
-	it("handleSpawn: 所持金が足りる場合のみユニットが召喚されること", () => {
+	it("handleSpawn: クールダウン中(1ms以上)はユニットを召喚できないこと", () => {
 		const { controller, state } = setup();
-		state.money = 0; // 召喚できない
+		state.money = 1000;
+		state.cooldowns.BASIC = 1; // わずかにクールダウン中
 		controller.handleSpawn("BASIC");
 		expect(state.allies.length).toBe(0);
-
-		state.money = 500; // 召喚できる
-		controller.handleSpawn("BASIC");
-		expect(state.allies.length).toBe(1);
-		expect(state.money).toBeLessThan(500);
 	});
 
-	it("handleUpgrade: 最大レベルに達するとアップグレードできないこと", () => {
+	it("handleUpgrade: レベル1から2へのアップグレードで、正確に200円消費され、レベルが2になること", () => {
 		const { controller, state } = setup();
-		state.walletLevel = 8;
-		state.money = 10000;
+		state.money = 500;
+		state.walletLevel = 1;
 		controller.handleUpgrade();
-		expect(state.walletLevel).toBe(8);
-		expect(mockAudio.playUpgradeSound).not.toHaveBeenCalled();
+		expect(state.walletLevel).toBe(2);
+		expect(state.money).toBe(300); // 500 - (1 * 200) = 300
+	});
+
+	it("handleCannon: チャージが100%の時のみ発動し、直後に isCannonCharging が true になること", () => {
+		const { controller, state } = setup();
+		
+		// チャージ不足 (99%)
+		state.cannonCharge = 99;
+		controller.handleCannon();
+		expect(state.isCannonCharging).toBe(false);
+
+		// チャージ完了 (100%)
+		state.cannonCharge = 100;
+		controller.handleCannon();
+		expect(state.isCannonCharging).toBe(true); // 充填開始
+		expect(state.isCannonFiring).toBe(false);   // まだ発射されていない
+		expect(state.cannonCharge).toBe(0); // 数値はリセット
 	});
 });

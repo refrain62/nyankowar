@@ -178,12 +178,18 @@ export const useGameController = (
 
 		setTimeout(() => {
 			s.isCannonCharging = false;
+			s.isCannonFiring = true; // 発射エフェクト開始
 			audio.playCannonExplosionSound();
 
 			// 画面上の全敵ユニットに大ダメージとノックバック
 			s.enemies = s.enemies
 				.map((u) => ({ ...u, currentHp: u.currentHp - 150, x: u.x + 120 }))
 				.filter((u) => u.currentHp > 0);
+
+			// 200ms後に発射エフェクトを終了
+			setTimeout(() => {
+				s.isCannonFiring = false;
+			}, 200);
 		}, 500);
 	}, [audio, stateRef]);
 
