@@ -87,7 +87,6 @@ export const processUnitsAndCombat = (
 	timestamp: number,
 ) => {
 	let someoneIsAttacking = false;
-	const _allUnits = [...s.allies, ...s.enemies];
 
 	// 味方の更新
 	s.allies = s.allies

@@ -37,14 +37,13 @@ describe("gameSystems", () => {
 
 	it("updateEconomy: 働きネコのレベルに応じて所持金が増えること", () => {
 		const state = createInitialState();
-		updateEconomy(state, 1); // 1秒経過
-		// 初期レベル1: 30 + 1*20 = 50
+		updateEconomy(state, 1);
 		expect(state.money).toBe(50);
 	});
 
 	it("updateCooldowns: 時間経過でクールダウンが減り、完了時にSEが鳴ること", () => {
 		const state = createInitialState();
-		updateCooldowns(state, 1, mockAudio); // 1秒経過
+		updateCooldowns(state, 1, mockAudio);
 		expect(state.cooldowns.BASIC).toBe(0);
 		expect(mockAudio.playCharinSound).toHaveBeenCalled();
 	});
@@ -53,31 +52,35 @@ describe("gameSystems", () => {
 		const state = createInitialState();
 		const stage = STAGES[1];
 		state.enemySpawnTimer = stage.enemySpawnRate - 100;
-		spawnEnemies(state, 0.2, stage); // 200ms経過
+		spawnEnemies(state, 0.2, stage);
 		expect(state.enemies.length).toBe(1);
 		expect(state.enemySpawnTimer).toBe(0);
 	});
 
 	it("processUnitsAndCombat: 射程内のユニット同士がダメージを与え合うこと", () => {
 		const state = createInitialState();
-		state.allies.push({
-			id: 1,
-			x: 400,
-			y: 0,
-			type: "ally",
-			unitType: "BASIC",
-			stats: { range: 100, damage: 10, hp: 100 } as any,
-			currentHp: 100,
-		});
-		state.enemies.push({
-			id: 2,
-			x: 450,
-			y: 0,
-			type: "enemy",
-			unitType: "ENEMY",
-			stats: { range: 100, damage: 10, hp: 100 } as any,
-			currentHp: 100,
-		});
+		state.allies = [
+			{
+				id: 1,
+				x: 400,
+				y: 0,
+				type: "ally",
+				unitType: "BASIC",
+				stats: { range: 100, damage: 10, hp: 100 } as any,
+				currentHp: 100,
+			},
+		];
+		state.enemies = [
+			{
+				id: 2,
+				x: 450,
+				y: 0,
+				type: "enemy",
+				unitType: "ENEMY",
+				stats: { range: 100, damage: 10, hp: 100 } as any,
+				currentHp: 100,
+			},
+		];
 
 		processUnitsAndCombat(state, 1, mockAudio, STAGES[1], 1000);
 

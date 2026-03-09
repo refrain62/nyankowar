@@ -29,7 +29,7 @@ type SetUi = React.Dispatch<React.SetStateAction<UIState>>;
  * 計算ロジックは src/logic/gameSystems.ts に委譲されています。
  */
 export const useGameLoop = (
-	canvasRef: RefObject<HTMLCanvasElement>,
+	canvasRef: RefObject<HTMLCanvasElement | null>,
 	stateRef: GameStateRef,
 	audioRef: AudioRef,
 	currentStageRef: CurrentStageRef,

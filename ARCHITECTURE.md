@@ -3,26 +3,32 @@
 ## 0. 技術スタック (Tech Stack)
 - **UI:** React 19 / TypeScript
 - **設計:** Controller-System-View (CSV)
-- **品質保証:** **Hybrid Testing Strategy (Unit + E2E)**
+- **品質保証:** Hybrid Testing Strategy (Unit + E2E)
 
 ## 1. テスト戦略 (Testing Strategy)
-本プロジェクトでは、速度と精度のバランスをとるために以下の二段構えのテストを実施しています。
+本プロジェクトでは、「正しく」「適切に」といった曖昧な評価基準を廃止し、定量的かつ観測可能な状態（数値・状態遷移）を期待値として定義します。
 
 ### ① ロジックの検証 (Vitest + React Testing Library)
-- **対象:** `gameSystems.ts`, `useGameController.ts`, `useGameAudio.ts`
-- **目的:** 経済計算や戦闘判定、状態遷移などの「数学的・論理的正しさ」を高速に保証。
-- **特徴:** 仮想DOM (JSDOM) 上で動作し、CI環境でも数秒で実行完了。
+- **期待値の定義例:**
+    - 「updateEconomyを実行後、所持金が (基本給 + Lv*倍率) 分増加していること」
+    - 「HPが0以下になった瞬間、ユニット配列から該当IDが削除されていること」
+    - 「ボタンクリック後、1フレーム以内に transitionTo が指定の状態名で呼ばれること」
 
-### ② 実機挙動の検証 (Playwright) [NEW]
-- **対象:** ゲーム全体のユーザーフロー、Canvas 描画結果
-- **目的:** ブラウザ実機において「Canvas に正しくキャラが表示されているか」「BGM は鳴っているか」「画面遷移はスムーズか」という、RTL では不可能な「体験の正しさ」を保証。
-- **特徴:** ヘッドレスブラウザによる E2E 検証。ビジュアルレグレッションテスト（画像比較）を含む。
+### ③ 実機挙動の検証 (Playwright)
+- **期待値の定義例:**
+    - 「Canvasの (x, y) 座標のピクセル色が、BGM ON時に特定の色相（エフェクト発生）と一致すること」
+    - 「PAUSEボタン押下後、次のフレームで全ユニットの X 座標の変化量が 0 であること」
+    - 「AudioContext.state がユーザーの初回の操作（Click）後に 'running' に遷移していること」
+
+### ④ 型安全性と CI/CD (Type Safety & CI/CD)
+- **厳格な型定義:** `any` の使用を極力排除し、`RefObject` などの React Hooks における Null 安全性を型レベルで保証。
+- **ビルドの不変性:** 環境に依存せず、常に `tsc -b && vite build` が 0 エラーで完了することを CI 上で保証し、デプロイ後のランタイムエラーを未然に防止。
 
 ## 2. 責任の分離 (Separation of Concerns)
-- **View Layer (`Game.tsx`)**: Playwright の主な検証対象。
-- **Controller Layer (`useGameController.ts`)**: RTL と Playwright 両方の検証対象。
-- **System Layer (`gameSystems.ts`)**: RTL の主な検証対象。
+- **View Layer**: Playwright によるピクセル・状態遷移検証の対象。
+- **Controller Layer**: RTL による命令発行の正確性検証の対象。
+- **System Layer**: ロジック関数に対する純粋な数値計算検証の対象。
 
 ## 3. 実装の哲学
-### useEffect-free & Event-Driven
-副作用を排除し、全てを明示的なイベント（ボタンクリック等）に紐付けることで、自動テストプログラム（Playwright）からの操作が極めて容易になっています。「いつ、何が起きるか」が明確な設計は、高いテスト適格性（Testability）に直結します。
+### 明示的期待値 (Concrete Expectations)
+「動いているように見える」はテストではありません。「期待した瞬間に、期待した数値になっていること」を自動検証し続けることで、人間の主観による見落としを完全に排除します。

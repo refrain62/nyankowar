@@ -23,23 +23,30 @@ HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
 });
 
 // AudioContext のモック
-global.AudioContext = vi.fn().mockImplementation(() => ({
-	state: "suspended",
-	resume: vi.fn().mockResolvedValue(undefined),
-	createOscillator: vi.fn().mockReturnValue({
-		type: "",
-		frequency: { setValueAtTime: vi.fn() },
-		connect: vi.fn(),
-		start: vi.fn(),
-		stop: vi.fn(),
-	}),
-	createGain: vi.fn().mockReturnValue({
-		gain: {
-			setValueAtTime: vi.fn(),
-			exponentialRampToValueAtTime: vi.fn(),
-		},
-		connect: vi.fn(),
-	}),
-	destination: {},
-	currentTime: 0,
-})) as any;
+function MockAudioContext() {
+	return {
+		state: "suspended",
+		currentTime: 0,
+		resume: vi.fn().mockResolvedValue(undefined),
+		createOscillator: vi.fn().mockReturnValue({
+			type: "",
+			frequency: { setValueAtTime: vi.fn() },
+			connect: vi.fn(),
+			start: vi.fn(),
+			stop: vi.fn(),
+		}),
+		createGain: vi.fn().mockReturnValue({
+			gain: {
+				setValueAtTime: vi.fn(),
+				exponentialRampToValueAtTime: vi.fn(),
+			},
+			connect: vi.fn(),
+		}),
+		destination: {},
+	};
+}
+
+const AudioContextSpy = vi.fn().mockImplementation(MockAudioContext);
+
+(globalThis as any).AudioContext = AudioContextSpy;
+(window as any).AudioContext = AudioContextSpy;
