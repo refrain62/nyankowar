@@ -4,15 +4,16 @@ import { playStage3 } from "./bgm/stage3";
 import { playStage4 } from "./bgm/stage4";
 
 /**
- * ステージに応じたBGMの1ステップを再生
- *
- * 各ステージの専門ファイルから再生ロジックを呼び出します。
+ * 【責任】ステージBGMの再生統制。
+ * ゲームループから渡される「step」カウントに基づき、
+ * 各ステージ専用のシーケンサーを駆動します。
  */
 export const playBgmStep = (
 	ctx: AudioContext,
 	stageId: number,
 	step: number,
 ) => {
+	// ステージIDに応じたBGM関数を呼び出し
 	switch (stageId) {
 		case 1:
 			playStage1(ctx, step);

@@ -2,17 +2,19 @@ import type { UnitStats } from "../../../types/game";
 
 /**
  * ネコトカゲを描画する関数
- * 圧倒的な火炎放射（火炎の奔流）を実装
+ * 長い胴体と尻尾、そして圧倒的な「火炎放射 (Fire Blast)」のエフェクトが最大の特徴。
  */
 export const drawCatLizard = (
 	ctx: CanvasRenderingContext2D,
 	stats: UnitStats,
 	timestamp: number,
 ) => {
+	// 4本の足を順番に動かす歩行アニメーション
 	const walk = Math.sin(timestamp / 80) * 3;
 
-	// 攻撃アニメーションの計算
+	// 攻撃シークエンスの計算 (2秒周期)
 	const attackCycle = (timestamp % 2000) / 2000;
+	// 60%~95%のタイミングで火を噴く
 	const isFiring = attackCycle > 0.6 && attackCycle < 0.95;
 	const firePower = isFiring
 		? Math.sin(((attackCycle - 0.6) * Math.PI) / 0.35)
@@ -29,7 +31,7 @@ export const drawCatLizard = (
 	ctx.lineWidth = 2.5;
 	ctx.fillStyle = stats.color;
 
-	// 1. 足 (4本)
+	// 1. 四本足 (トカゲらしい這うような低い配置)
 	ctx.beginPath();
 	ctx.rect(-20, 5, 5, 8 + walk);
 	ctx.rect(-5, 5, 5, 8 - walk);
@@ -38,32 +40,33 @@ export const drawCatLizard = (
 	ctx.fill();
 	ctx.stroke();
 
-	// 2. 尻尾
+	// 2. 尻尾 (二次ベジェ曲線で大きくしなり、スイングさせる)
 	const tailSwing = Math.sin(timestamp / 80) * 10;
 	ctx.beginPath();
-	ctx.moveTo(-15, 0);
+	ctx.moveTo(-15, 0); // 胴体後部
 	ctx.quadraticCurveTo(-45, -35 + tailSwing, -70, 10 + tailSwing);
 	ctx.stroke();
 
-	// 3. 胴体
+	// 3. 胴体 (トカゲ特有の低い重心を表現する楕円)
 	ctx.beginPath();
 	ctx.ellipse(0, 5, stats.radius * 1.8, stats.radius * 0.8, 0, 0, Math.PI * 2);
 	ctx.fill();
 	ctx.stroke();
 
-	// 4. 背中のトゲ
+	// 4. 背中のトゲ (ループで3つ描画。爬虫類らしさを強調)
 	ctx.fillStyle = "#1e8449";
 	for (let i = 0; i < 3; i++) {
 		ctx.beginPath();
-		ctx.moveTo(-15 + i * 15, -2);
-		ctx.lineTo(-7 + i * 15, -18);
+		ctx.moveTo(-15 + i * 15, -2); // 胴体上部
+		ctx.lineTo(-7 + i * 15, -18); // 先端
 		ctx.lineTo(0 + i * 15, -2);
 		ctx.fill();
 		ctx.stroke();
 	}
 
-	// 5. 頭部 (攻撃時にグイッと前に出る)
+	// 5. 頭部 (攻撃時にグイッと前に乗り出す演出)
 	ctx.save();
+	// firePower（火を噴く勢い）に合わせて、首を前に伸ばし、少し沈み込ませる
 	ctx.translate(firePower * 15, -firePower * 5);
 	ctx.fillStyle = stats.color;
 	ctx.beginPath();
@@ -81,22 +84,25 @@ export const drawCatLizard = (
 	ctx.lineTo(stats.radius * 1.5, -18);
 	ctx.fill();
 	ctx.stroke();
+
 	ctx.fillStyle = "#333";
 	ctx.beginPath();
 	ctx.arc(stats.radius * 1.9, -10, 2.5, 0, Math.PI * 2);
 	ctx.fill();
 
-	// 6. 圧倒的な火炎放射 (Fire Blast)
+	// 6. 火炎放射 (Fire Blast) エフェクト
+	// 複数のレイヤーとグラデーションを重ねて「熱量」を表現
 	if (isFiring) {
-		const headX = stats.radius * 2.3;
+		const headX = stats.radius * 2.3; // 口の位置
 		const headY = -8;
-		const fireReach = firePower * 120; // 射程を伸ばす
-		const flicker = Math.sin(timestamp / 20) * 5; // 激しい揺らぎ
+		const fireReach = firePower * 120; // 射程距離。firePowerに連動して伸びる
+		const flicker = Math.sin(timestamp / 20) * 5; // 激しい火の粉の揺らぎ
 
-		// 炎のベース (外側の赤いゆらめき)
+		// レイヤー1: 外側の赤いゆらめき (広範囲な炎の熱気)
 		ctx.fillStyle = "#e74c3c";
 		ctx.beginPath();
 		ctx.moveTo(headX, headY);
+		// 上側の輪郭
 		ctx.bezierCurveTo(
 			headX + fireReach * 0.5,
 			headY - 40 + flicker,
@@ -105,6 +111,7 @@ export const drawCatLizard = (
 			headX + fireReach,
 			headY,
 		);
+		// 下側の輪郭
 		ctx.bezierCurveTo(
 			headX + fireReach,
 			headY + 20,
@@ -115,16 +122,16 @@ export const drawCatLizard = (
 		);
 		ctx.fill();
 
-		// 炎の芯 (中央のオレンジ〜黄色の高温部)
+		// レイヤー2: 内側の高温部 (グラデーションによるコアの表現)
 		const fireGrad = ctx.createLinearGradient(
 			headX,
 			headY,
 			headX + fireReach,
 			headY,
 		);
-		fireGrad.addColorStop(0, "#f1c40f"); // 根元は黄色
-		fireGrad.addColorStop(0.6, "#e67e22"); // 中間はオレンジ
-		fireGrad.addColorStop(1, "rgba(231, 76, 60, 0)"); // 先端は赤く消える
+		fireGrad.addColorStop(0, "#f1c40f"); // 吐き出し口付近は超高温(黄色)
+		fireGrad.addColorStop(0.6, "#e67e22"); // 中間は燃焼中(オレンジ)
+		fireGrad.addColorStop(1, "rgba(231, 76, 60, 0)"); // 先端は空気と混ざり消える(赤から透明へ)
 
 		ctx.fillStyle = fireGrad;
 		ctx.beginPath();
@@ -138,13 +145,13 @@ export const drawCatLizard = (
 		ctx.quadraticCurveTo(headX + fireReach * 0.5, headY + 20, headX, headY);
 		ctx.fill();
 
-		// 最中心部 (白い光)
+		// レイヤー3: 最中心部 (白い光。最も熱い火炎の核)
 		ctx.fillStyle = "#fff";
 		ctx.beginPath();
 		ctx.ellipse(
 			headX + 10,
 			headY,
-			15 * firePower,
+			15 * firePower, // 勢いに合わせて膨らむ
 			5 * firePower,
 			0,
 			0,
