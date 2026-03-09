@@ -2,6 +2,7 @@
 
 ## 1. 技術スタック
 - **フレームワーク:** React 19 (TypeScript)
+- **リンター/フォーマッタ:** Biome (高速な静的解析と整形)
 - **設計パターン:** Controller-System-View (疎結合アーキテクチャ)
 - **描画:** Pure HTML5 Canvas
 - **音声:** Web Audio API (Stable Interface & ポーズ対応)

@@ -2,6 +2,7 @@
 
 ## 0. 技術スタック (Tech Stack)
 - **UI:** React 19 / TypeScript
+- **Linter/Formatter:** Biome
 - **描画:** HTML5 Canvas API
 - **音声:** Web Audio API (Stable Interface & ポーズ対応)
 - **設計思想:** **Controller-System-View (CSV Pattern)**
