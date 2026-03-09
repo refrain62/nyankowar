@@ -1,7 +1,6 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { STAGES } from "../constants/stages";
-import { UNIT_TYPES } from "../constants/units";
 import { useGameAudio } from "../hooks/useGameAudio";
 import { useGameController } from "../hooks/useGameController";
 import { useGameLoop } from "../hooks/useGameLoop";
@@ -12,7 +11,11 @@ import {
 	type StageConfig,
 	type UIState,
 } from "../types/game";
-import { GaugeButton } from "./UI/GaugeButton";
+import { ControlPanel } from "./UI/ControlPanel";
+import { PauseOverlay } from "./UI/PauseOverlay";
+import { ResultOverlay } from "./UI/ResultOverlay";
+import { StageSelectOverlay } from "./UI/StageSelectOverlay";
+import { TitleOverlay } from "./UI/TitleOverlay";
 
 /**
  * 【責任】ゲームのメインView（UI）。
@@ -167,165 +170,16 @@ const Game: React.FC = () => {
 					}}
 				/>
 
-				{/* 1. タイトル画面 */}
-				{ui.gameState === "title" && (
-					<button
-						type="button"
-						onClick={toStageSelect}
-						onKeyDown={(e) => e.key === "Enter" && toStageSelect()}
-						style={{
-							position: "absolute",
-							top: 0,
-							left: 0,
-							width: "100%",
-							height: "100%",
-							background: "rgba(255,255,255,0)",
-							display: "flex",
-							flexDirection: "column",
-							justifyContent: "space-between",
-							alignItems: "center",
-							borderRadius: "12px",
-							cursor: "pointer",
-							padding: "40px 0",
-							border: "none",
-						}}
-					>
-						<div
-							style={{
-								background: "rgba(255,255,255,0.9)",
-								padding: "20px 40px",
-								borderRadius: "20px",
-								boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-								border: "4px solid #2c3e50",
-								marginTop: "20px",
-							}}
-						>
-							<h2
-								style={{
-									fontSize: "50px",
-									color: "#2c3e50",
-									margin: 0,
-									textShadow: "2px 2px 0 #fff, 4px 4px 0 #bdc3c7",
-								}}
-							>
-								ねこねこ大戦争
-							</h2>
-						</div>
-						<div
-							style={{
-								marginBottom: "60px",
-								background: "linear-gradient(to bottom, #f1c40f, #f39c12)",
-								padding: "5px 15px",
-								borderRadius: "10px",
-								boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-								border: "3px solid #fff",
-								outline: "2px solid #2c3e50",
-								animation: "blink 1.2s infinite",
-							}}
-						>
-							<p
-								style={{
-									fontSize: "22px",
-									color: "#fff",
-									fontWeight: "900",
-									margin: 0,
-									letterSpacing: "2px",
-									textShadow: "1px 1px 3px rgba(0,0,0,0.5)",
-								}}
-							>
-								CLICK TO START
-							</p>
-						</div>
-						<style>{`@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }`}</style>
-					</button>
-				)}
+				{/* 各種オーバーレイ */}
+				{ui.gameState === "title" && <TitleOverlay onStart={toStageSelect} />}
 
-				{/* 2. ステージ選択画面 */}
 				{ui.gameState === "start" && (
-					<div
-						style={{
-							position: "absolute",
-							top: 0,
-							left: 0,
-							width: "100%",
-							height: "100%",
-							background: "rgba(0,0,0,0.6)",
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-							borderRadius: "12px",
-						}}
-					>
-						<div
-							style={{
-								background: "rgba(255,255,255,0.95)",
-								padding: "20px 30px",
-								borderRadius: "20px",
-								boxShadow: "0 10px 40px rgba(0,0,0,0.4)",
-								textAlign: "center",
-								maxWidth: "500px",
-								border: "3px solid #2ecc71",
-							}}
-						>
-							<h2
-								style={{
-									fontSize: "24px",
-									color: "#2c3e50",
-									marginBottom: "15px",
-									marginTop: 0,
-								}}
-							>
-								ステージ選択
-							</h2>
-							<div
-								style={{
-									display: "grid",
-									gridTemplateColumns: "1fr 1fr",
-									gap: "10px",
-								}}
-							>
-								{Object.values(STAGES).map((stage) => (
-									<button
-										type="button"
-										key={stage.id}
-										onClick={() => startGame(stage)}
-										style={{
-											padding: "12px 15px",
-											fontSize: "14px",
-											cursor: "pointer",
-											borderRadius: "10px",
-											background: stage.id % 2 === 0 ? "#e67e22" : "#2ecc71",
-											color: "#fff",
-											border: "none",
-											fontWeight: "bold",
-											boxShadow: "0 3px rgba(0,0,0,0.2)",
-										}}
-									>
-										第{stage.id}章<br />
-										{stage.name}
-									</button>
-								))}
-							</div>
-							<button
-								type="button"
-								onClick={backToTitle}
-								style={{
-									marginTop: "15px",
-									background: "none",
-									border: "none",
-									color: "#7f8c8d",
-									fontSize: "13px",
-									textDecoration: "underline",
-									cursor: "pointer",
-								}}
-							>
-								タイトルへ戻る
-							</button>
-						</div>
-					</div>
+					<StageSelectOverlay
+						onSelectStage={startGame}
+						onBackToTitle={backToTitle}
+					/>
 				)}
 
-				{/* 3. プレイ中のオーバーレイ */}
 				{ui.gameState === "play" && (
 					<div
 						style={{
@@ -369,224 +223,28 @@ const Game: React.FC = () => {
 					</div>
 				)}
 
-				{/* 4. ポーズ画面 */}
 				{ui.gameState === "pause" && (
-					<div
-						style={{
-							position: "absolute",
-							top: 0,
-							left: 0,
-							width: "100%",
-							height: "100%",
-							background: "rgba(0,0,0,0.5)",
-							color: "#fff",
-							display: "flex",
-							flexDirection: "column",
-							justifyContent: "center",
-							alignItems: "center",
-							borderRadius: "12px",
-						}}
-					>
-						<h2
-							style={{
-								fontSize: "40px",
-								marginBottom: "20px",
-								textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
-							}}
-						>
-							PAUSED
-						</h2>
-						<div style={{ display: "flex", gap: "15px" }}>
-							<button
-								type="button"
-								onClick={togglePause}
-								style={{
-									padding: "12px 25px",
-									fontSize: "18px",
-									cursor: "pointer",
-									borderRadius: "10px",
-									background: "#2ecc71",
-									color: "#fff",
-									border: "none",
-									fontWeight: "bold",
-									boxShadow: "0 4px #27ae60",
-								}}
-							>
-								RESUME
-							</button>
-							<button
-								type="button"
-								onClick={() => startGame(currentStage)}
-								style={{
-									padding: "12px 25px",
-									fontSize: "18px",
-									cursor: "pointer",
-									borderRadius: "10px",
-									background: "#f39c12",
-									color: "#fff",
-									border: "none",
-									fontWeight: "bold",
-									boxShadow: "0 4px #d35400",
-								}}
-							>
-								RESTART
-							</button>
-							<button
-								type="button"
-								onClick={backToMenu}
-								style={{
-									padding: "12px 25px",
-									fontSize: "18px",
-									cursor: "pointer",
-									borderRadius: "10px",
-									background: "#e74c3c",
-									color: "#fff",
-									border: "none",
-									fontWeight: "bold",
-									boxShadow: "0 4px #c0392b",
-								}}
-							>
-								QUIT
-							</button>
-						</div>
-					</div>
+					<PauseOverlay
+						currentStage={currentStage}
+						onResume={togglePause}
+						onRestart={startGame}
+						onQuit={backToMenu}
+					/>
 				)}
 
-				{/* 5. 勝敗画面 */}
 				{(ui.gameState === "win" || ui.gameState === "lose") && (
-					<div
-						style={{
-							position: "absolute",
-							top: 0,
-							left: 0,
-							width: "100%",
-							height: "100%",
-							background: "rgba(0,0,0,0.7)",
-							color: "#fff",
-							display: "flex",
-							flexDirection: "column",
-							justifyContent: "center",
-							alignItems: "center",
-							borderRadius: "12px",
-						}}
-					>
-						<h2
-							style={{
-								fontSize: "60px",
-								color: ui.gameState === "win" ? "#f1c40f" : "#e74c3c",
-							}}
-						>
-							{ui.gameState === "win" ? "VICTORY" : "DEFEAT"}
-						</h2>
-						<button
-							type="button"
-							onClick={backToMenu}
-							style={{
-								padding: "15px 40px",
-								fontSize: "24px",
-								cursor: "pointer",
-								borderRadius: "8px",
-								background: "#3498db",
-								color: "#fff",
-								border: "none",
-								fontWeight: "bold",
-							}}
-						>
-							BACK TO MENU
-						</button>
-					</div>
+					<ResultOverlay gameState={ui.gameState} onBackToMenu={backToMenu} />
 				)}
 			</div>
 
-			{/* 6. 操作パネル */}
+			{/* 下部操作パネル */}
 			{ui.gameState === "play" && (
-				<div
-					style={{
-						maxWidth: "850px",
-						margin: "0 auto",
-						display: "flex",
-						justifyContent: "center",
-						gap: "20px",
-						animation: "fadeIn 0.5s",
-					}}
-				>
-					<div
-						style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-					>
-						<GaugeButton
-							label={
-								<>
-									にゃんこ砲
-									<br />({ui.cannonCharge}%)
-								</>
-							}
-							percent={ui.cannonCharge}
-							onClick={handleCannon}
-							disabled={ui.cannonCharge < 100}
-							readyColor="#e74c3c"
-							gaugeColor="#f39c12"
-							width="120px"
-						/>
-						<GaugeButton
-							label={
-								<>
-									働きネコ Lv.{ui.walletLevel}
-									<br />
-									(${ui.walletLevel * 200})
-								</>
-							}
-							percent={100}
-							onClick={handleUpgrade}
-							disabled={ui.money < ui.walletLevel * 200 || ui.walletLevel >= 8}
-							readyColor="#e67e22"
-							gaugeColor="#e67e22"
-							width="120px"
-						/>
-					</div>
-					<div
-						style={{
-							display: "grid",
-							gridTemplateColumns: "repeat(4, 120px)",
-							gridTemplateRows: "repeat(2, auto)",
-							gap: "10px",
-						}}
-					>
-						{(
-							[
-								"BASIC",
-								"TANK",
-								"BATTLE",
-								"LEGS",
-								"COW",
-								"BIRD",
-								"FISH",
-								"LIZARD",
-							] as const
-						).map((t) => {
-							const percent = ui.cooldownPercents[t];
-							const isReady = percent >= 100 && ui.money >= UNIT_TYPES[t].cost;
-							return (
-								<GaugeButton
-									key={t}
-									label={
-										<>
-											{UNIT_TYPES[t].name}
-											<br />
-											(${UNIT_TYPES[t].cost})
-										</>
-									}
-									percent={percent}
-									onClick={() => handleSpawn(t)}
-									disabled={!isReady}
-									readyColor="#2ecc71"
-									gaugeColor="#3498db"
-									width="120px"
-								/>
-							);
-						})}
-					</div>
-					<style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }`}</style>
-				</div>
+				<ControlPanel
+					ui={ui}
+					onSpawn={handleSpawn}
+					onUpgrade={handleUpgrade}
+					onCannon={handleCannon}
+				/>
 			)}
 		</div>
 	);
