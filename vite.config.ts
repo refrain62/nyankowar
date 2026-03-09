@@ -5,4 +5,9 @@ import { defineConfig } from "vite";
 export default defineConfig({
 	plugins: [react()],
 	base: "./", // GitHub Pages用に相対パスでビルドするように設定
+	test: {
+		globals: true,
+		environment: "jsdom",
+		setupFiles: "./src/test/setup.ts",
+	},
 });
