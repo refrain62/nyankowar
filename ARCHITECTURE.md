@@ -1,37 +1,28 @@
-# ねこねこ大戦争: アーキテクチャ設計書 (Final)
+# ねこねこ大戦争: アーキテクチャ設計書 (Final + QA)
 
 ## 0. 技術スタック (Tech Stack)
 - **UI:** React 19 / TypeScript
-- **ビルド・品質:** Vite 8 / Biome
-- **描画:** HTML5 Canvas API (数式ベース)
-- **音声:** Web Audio API (リアルタイム合成)
-- **設計思想:** **Controller-System-View (CSV Pattern) & Event-Driven FSM**
+- **設計:** Controller-System-View (CSV)
+- **品質保証:** **Hybrid Testing Strategy (Unit + E2E)**
 
-## 1. 責任の分離 (Separation of Concerns)
-プロジェクトは以下の3つの役割に厳密に分離され、お互いに疎結合な状態を維持しています。
+## 1. テスト戦略 (Testing Strategy)
+本プロジェクトでは、速度と精度のバランスをとるために以下の二段構えのテストを実施しています。
 
-### ① View Layer (`Game.tsx`, `renderer.ts`)
-- **役割:** ユーザーインターフェースの配置と描画。
-- **特徴:** 「純粋（Pure）」な層。計算を行わず、渡されたデータを可視化することに専念します。
+### ① ロジックの検証 (Vitest + React Testing Library)
+- **対象:** `gameSystems.ts`, `useGameController.ts`, `useGameAudio.ts`
+- **目的:** 経済計算や戦闘判定、状態遷移などの「数学的・論理的正しさ」を高速に保証。
+- **特徴:** 仮想DOM (JSDOM) 上で動作し、CI環境でも数秒で実行完了。
 
-### ② Controller Layer (`useGameController.ts`)
-- **役割:** ユーザーアクションの解釈と状態遷移の統制。
-- **特徴:** ゲームの「脳」。状態（FSM）を切り替え、音響やシステムへ命令を飛ばします。
+### ② 実機挙動の検証 (Playwright) [NEW]
+- **対象:** ゲーム全体のユーザーフロー、Canvas 描画結果
+- **目的:** ブラウザ実機において「Canvas に正しくキャラが表示されているか」「BGM は鳴っているか」「画面遷移はスムーズか」という、RTL では不可能な「体験の正しさ」を保証。
+- **特徴:** ヘッドレスブラウザによる E2E 検証。ビジュアルレグレッションテスト（画像比較）を含む。
 
-### ③ System Layer (`gameSystems.ts`, `useGameLoop.ts`)
-- **役割:** 世界の更新（物理演算・経済・戦闘）。
-- **特徴:** Reactのサイクルから独立。高速な `requestAnimationFrame` に同期して `stateRef` を直接操作します。
+## 2. 責任の分離 (Separation of Concerns)
+- **View Layer (`Game.tsx`)**: Playwright の主な検証対象。
+- **Controller Layer (`useGameController.ts`)**: RTL と Playwright 両方の検証対象。
+- **System Layer (`gameSystems.ts`)**: RTL の主な検証対象。
 
-## 2. 視覚と音響のエンジニアリング
-### ① 数式描画アニメーション
-全てのユニットは `timestamp` を引数に持つ純粋関数で描画されます。`Math.sin` や `BezierCurve` を駆使し、フレームレートに依存しない滑らかな動きと、画像を使わない豊かな表現（火炎、エフェクト等）を両立しています。
-
-### ② リアルタイム音響合成
-Web Audio API の `OscillatorNode` を直接操作。BGM のステップ管理（`bgmStepRef`）により、一時停止からの正確な再開を実現しています。
-
-## 3. 状態管理の哲学
-### ① useEffect-free
-React の `useEffect` は「副作用の同期」ではなく、Canvas や Web Audio などの「外部リソースとの接続・破棄」のみに使用。ゲームの状態変化は全てイベント駆動で行われます。
-
-### ② 自己説明的なコード
-全ファイルに senior engineer 視点での詳細コメントを完備。各座標や周波数パラメータの意味が明文化されており、高いオンボーディング性と保守性を備えています。
+## 3. 実装の哲学
+### useEffect-free & Event-Driven
+副作用を排除し、全てを明示的なイベント（ボタンクリック等）に紐付けることで、自動テストプログラム（Playwright）からの操作が極めて容易になっています。「いつ、何が起きるか」が明確な設計は、高いテスト適格性（Testability）に直結します。
