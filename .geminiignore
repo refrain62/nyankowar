@@ -1,0 +1,8 @@
+# Playwright artifacts (Keep .md for context)
+playwright-report/index.html
+playwright-report/data/
+test-results/**/*.png
+test-results/**/*.zip
+test-results/**/*.json
+blob-report/
+playwright/.cache/

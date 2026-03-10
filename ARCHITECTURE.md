@@ -24,6 +24,7 @@
 ### ④ 型安全性と CI/CD (Type Safety & CI/CD)
 - **厳格な型定義:** `any` の使用を完全に排除。React Hooks における `RefObject` や、カスタムフックの戻り値型（`GameAudio` など）をテストコードを含めて一貫して適用し、Null 安全性と型推論を最大化。
 - **CI 自動検証パイプライン:** GitHub Actions により、`push` および `pull_request` ごとに `Lint` (Biome) と `Unit Test` (Vitest) を個別ジョブとして実行。
+- **構成管理の最適化:** AI エージェントのコンテキスト効率を最大化するため、`.geminiignore` を用いて、動的に生成される大規模ファイル（バイナリ、JSON等）を解析対象から除外する。ただし、`.md` 形式のエラーコンテキストは保持し、AI が直接失敗原因（期待値と実測値の乖離）を数値で特定可能にする。
 - **ビルドの不変性:** `Lint` および `Test` ジョブがすべてパスした場合にのみ `Production Build` を実行し、デプロイ品質を 100% 維持。
 
 ## 2. 責任の分離 (Separation of Concerns)
