@@ -23,6 +23,11 @@
 
 ### ④ 型安全性と CI/CD (Type Safety & CI/CD)
 - **厳格な型定義:** `any` の使用を完全に排除。`useGameController.test.ts` を含む全テストコードにおいて `any` を排除し、適切なインターフェースまたは `as unknown as Type` による安全な型キャスト（必要な場合のみ）を採用。
+- **Git Hook による物理的ガードレール:** 
+    - Husky を使用し、`git commit` 時は `pnpm run lint` を実行し、開発リズムを損なわずスタイルを矯正。
+    - `git push` の直前には `pnpm run lint` と `pnpm run test` を強制し、最終的な品質保証を完遂。
+    - エラーが1件でも存在する場合、Git 操作を中断させ、不適切なコードの混入を防ぐ。
+
 - **Lint とフォーマットの自動検証:** Biome による import ソート、フォーマット、および `noExplicitAny` ルールの厳格な適用。
 - **CI 自動検証パイプライン:** GitHub Actions により、`push` および `pull_request` ごとに `Lint` (Biome) と `Unit Test` (Vitest) を個別ジョブとして実行。
 - **構成管理の最適化:** AI エージェントのコンテキスト効率を最大化するため、`.geminiignore` を用いて、動的に生成される大規模ファイル（バイナリ、JSON等）を解析対象から除外する。ただし、`.md` 形式のエラーコンテキストは保持し、AI が直接失敗原因（期待値と実測値の乖離）を数値で特定可能にする。

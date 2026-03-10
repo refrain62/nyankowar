@@ -64,6 +64,9 @@ test.describe("ねこねこ大戦争 E2Eシナリオ", () => {
 	test("にゃんこ砲: 100%チャージ後に発射可能になり、発射後にチャージが0%に戻ること", async ({
 		page,
 	}) => {
+		// 30秒以上の待機が必要なため、テストタイムアウトを延長
+		test.setTimeout(50000);
+
 		await page.getByText("CLICK TO START").click();
 		await page.getByText("第1章").click();
 
@@ -164,6 +167,24 @@ test.describe("ねこねこ大戦争 E2Eシナリオ", () => {
 
 		// 期待値: 最終的に VICTORY オーバーレイが表示されること
 		await expect(page.getByText("VICTORY")).toBeVisible({ timeout: 60000 });
+
+		// BACK TO MENU で戻れること
+		await page.getByText("BACK TO MENU").click();
+		await expect(page.getByText("ステージ選択")).toBeVisible();
+	});
+
+	test("敗北シナリオ: 第4章で何もせず待機し、自軍の拠点が早期に破壊されて DEFEAT が表示されること", async ({
+		page,
+	}) => {
+		// 第4章は敵の出現頻度が高く、HP/攻撃力倍率も高いため、早期決着が期待できる
+		test.setTimeout(120000);
+
+		await page.getByText("CLICK TO START").click();
+		await page.getByText("第4章").click();
+
+		// 何も召喚せずに待機
+		// 期待値: 最終的に DEFEAT オーバーレイが表示されること
+		await expect(page.getByText("DEFEAT")).toBeVisible({ timeout: 90000 });
 
 		// BACK TO MENU で戻れること
 		await page.getByText("BACK TO MENU").click();

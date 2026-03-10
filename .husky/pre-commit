@@ -1,0 +1,4 @@
+# Add node to PATH for Windows mise
+export PATH="$HOME/AppData/Local/mise/shims:$PATH"
+
+pnpm run lint
