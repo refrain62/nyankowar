@@ -67,7 +67,9 @@ test.describe("ねこねこ大戦争 E2Eシナリオ", () => {
 		await page.getByText("CLICK TO START").click();
 		await page.getByText("第1章").click();
 
-		const cannonButton = page.locator("button").filter({ hasText: "にゃんこ砲" });
+		const cannonButton = page
+			.locator("button")
+			.filter({ hasText: "にゃんこ砲" });
 
 		// 初期状態は 0%
 		await expect(cannonButton).toContainText("(0%)");
