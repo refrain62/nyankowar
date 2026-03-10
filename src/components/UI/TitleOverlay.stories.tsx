@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, userEvent, within } from "@storybook/test";
-import { vi } from "vitest";
+import { expect, fn, userEvent, within } from "@storybook/test";
 import { TitleOverlay } from "./TitleOverlay";
 
 const meta: Meta<typeof TitleOverlay> = {
@@ -8,6 +7,9 @@ const meta: Meta<typeof TitleOverlay> = {
 	component: TitleOverlay,
 	parameters: {
 		layout: "fullscreen",
+	},
+	args: {
+		onStart: fn(),
 	},
 };
 
@@ -20,7 +22,7 @@ type Story = StoryObj<typeof TitleOverlay>;
  */
 export const Default: Story = {
 	args: {
-		onStart: vi.fn(),
+		onStart: fn(),
 	},
 	play: async ({ canvasElement, args }) => {
 		const canvas = within(canvasElement);

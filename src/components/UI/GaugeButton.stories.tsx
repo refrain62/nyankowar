@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, within } from "@storybook/test";
-import { vi } from "vitest";
+import { expect, fn, within } from "@storybook/test";
 import { GaugeButton } from "./GaugeButton";
 
 const meta: Meta<typeof GaugeButton> = {
 	title: "UI/GaugeButton",
 	component: GaugeButton,
+	args: {
+		onClick: fn(),
+	},
 };
 
 export default meta;
@@ -23,7 +25,7 @@ export const Charging: Story = {
 		readyColor: "#2ecc71",
 		gaugeColor: "#f1c40f",
 		width: "200px",
-		onClick: vi.fn(),
+		onClick: fn(),
 	},
 	play: async ({ canvasElement }) => {
 		const canvas = within(canvasElement);
@@ -50,7 +52,7 @@ export const Ready: Story = {
 		disabled: false,
 		readyColor: "#2ecc71",
 		gaugeColor: "#f1c40f",
-		onClick: vi.fn(),
+		onClick: fn(),
 	},
 	play: async ({ canvasElement }) => {
 		const canvas = within(canvasElement);
@@ -74,7 +76,7 @@ export const Disabled: Story = {
 		disabled: true,
 		readyColor: "#2ecc71",
 		gaugeColor: "#f1c40f",
-		onClick: vi.fn(),
+		onClick: fn(),
 	},
 	play: async ({ canvasElement }) => {
 		const canvas = within(canvasElement);

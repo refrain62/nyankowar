@@ -1,12 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, userEvent, within } from "@storybook/test";
-import { vi } from "vitest";
+import { expect, fn, userEvent, within } from "@storybook/test";
 import { stage1 } from "../../constants/stages/stage1";
 import { PauseOverlay } from "./PauseOverlay";
 
 const meta: Meta<typeof PauseOverlay> = {
 	title: "UI/PauseOverlay",
 	component: PauseOverlay,
+	args: {
+		onResume: fn(),
+		onRestart: fn(),
+		onQuit: fn(),
+	},
 };
 
 export default meta;
@@ -20,9 +24,9 @@ type Story = StoryObj<typeof PauseOverlay>;
 export const Default: Story = {
 	args: {
 		currentStage: stage1,
-		onResume: vi.fn(),
-		onRestart: vi.fn(),
-		onQuit: vi.fn(),
+		onResume: fn(),
+		onRestart: fn(),
+		onQuit: fn(),
 	},
 	play: async ({ canvasElement, args }) => {
 		const canvas = within(canvasElement);
