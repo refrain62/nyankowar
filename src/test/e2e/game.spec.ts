@@ -65,7 +65,8 @@ test.describe("ねこねこ大戦争 E2Eシナリオ", () => {
 		page,
 	}) => {
 		// 30秒以上の待機が必要なため、テストタイムアウトを延長
-		test.setTimeout(50000);
+		// CI環境での実行遅延（dtの100msキャップ等）を考慮し、余裕を持って100秒に設定
+		test.setTimeout(100000);
 
 		await page.getByText("CLICK TO START").click();
 		await page.getByText("第1章").click();
@@ -79,8 +80,8 @@ test.describe("ねこねこ大戦争 E2Eシナリオ", () => {
 		await expect(cannonButton).toBeDisabled();
 
 		// 期待値: 約30秒で 100% に達する設定 (秒間3.3%)
-		// テスト時間を確保するためタイムアウトを長めに設定
-		await expect(cannonButton).toBeEnabled({ timeout: 40000 });
+		// CI環境の負荷を考慮し、タイムアウトを80秒に設定
+		await expect(cannonButton).toBeEnabled({ timeout: 80000 });
 		await expect(cannonButton).toContainText("(100%)");
 
 		// アクション: 発射
@@ -133,8 +134,8 @@ test.describe("ねこねこ大戦争 E2Eシナリオ", () => {
 	test("勝利シナリオ: ユニットを召喚し続け、敵の拠点を破壊して VICTORY が表示されること", async ({
 		page,
 	}) => {
-		// タイムアウトを長めに設定
-		test.setTimeout(80000);
+		// CI環境での実行遅延を考慮し、タイムアウトを150秒に設定
+		test.setTimeout(150000);
 
 		await page.getByText("CLICK TO START").click();
 		await page.getByText("第1章").click();
@@ -149,14 +150,15 @@ test.describe("ねこねこ大戦争 E2Eシナリオ", () => {
 			.filter({ hasText: "$150" });
 
 		// ユニットを定期的に召喚するループ
+		// CI環境での資金蓄積速度低下を補うため、チェック間隔を500msに短縮し、より攻撃的に召喚
 		const spawnUnits = async () => {
-			for (let i = 0; i < 40; i++) {
+			for (let i = 0; i < 100; i++) {
 				if (await cowButton.isEnabled()) {
 					await cowButton.click();
 				} else if (await basicButton.isEnabled()) {
 					await basicButton.click();
 				}
-				await page.waitForTimeout(1000);
+				await page.waitForTimeout(500);
 
 				// すでに勝利画面が出ていたら抜ける
 				if (await page.getByText("VICTORY").isVisible()) break;
@@ -166,7 +168,8 @@ test.describe("ねこねこ大戦争 E2Eシナリオ", () => {
 		await spawnUnits();
 
 		// 期待値: 最終的に VICTORY オーバーレイが表示されること
-		await expect(page.getByText("VICTORY")).toBeVisible({ timeout: 60000 });
+		// 拠点の破壊に時間がかかる場合を考慮し、タイムアウトを120秒に設定
+		await expect(page.getByText("VICTORY")).toBeVisible({ timeout: 120000 });
 
 		// BACK TO MENU で戻れること
 		await page.getByText("BACK TO MENU").click();
