@@ -24,7 +24,14 @@ export const Default: Story = {
 	args: {
 		onStart: fn(),
 	},
-	play: async ({ canvasElement, args }) => {
+	play: async ({
+		canvasElement,
+		args,
+	}: {
+		canvasElement: HTMLElement;
+		args: Story["args"];
+	}) => {
+		if (!args) return;
 		const canvas = within(canvasElement);
 
 		// タイトルテキストの存在確認

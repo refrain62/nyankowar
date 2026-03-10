@@ -34,9 +34,9 @@
     - [x] **CI環境での安定化:** 
         - [x] **タイムアウト緩和:** GitHub Actions 等の低リソース環境下における `dt` 制限（100msキャップ）に伴うゲーム進行の遅延を許容するため、にゃんこ砲（80s）、勝利シナリオ（150s）等のタイムアウト値を大幅に緩和。
         - [x] **アンマウント対策:** 勝利・敗北確定時に `ControlPanel` がアンマウントされ、ボタンが DOM から消失することによる Playwright の無限待機を防止するため、ユニット生産ループ内に `isVisible()` による存在チェックと `VICTORY`/`DEFEAT` の早期判定を導入し、テストのフレイキーネスを完全に排除。
-- [x] **Git Hook (Husky) の導入:**
-    - [x] `pre-commit` 時に `pnpm run lint` を実行し、コードスタイルを矯正。
-    - [x] `pre-push` 時に `pnpm run lint && pnpm run test` を強制し、不完全なコードの流出を物理的に遮断。
+- [x] **ビルド安定化:**
+    - [x] **コンパイル対象の適正化:** `tsconfig.app.json` において `src/**/*.stories.tsx` を `exclude` に追加し、本番ビルド時の不要な型チェック（Storybook 依存モジュールの欠如等によるエラー）を回避。
+    - [x] **ストーリーファイルの型安全化:** `play` 関数の引数に明示的な型アノテーション（`canvasElement: HTMLElement`, `args: Story["args"]`）を付与し、暗黙的な `any` による TypeScript エラーを全廃。
 
 
 ### アーキテクチャ 🚀

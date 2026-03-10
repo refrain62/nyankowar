@@ -27,7 +27,7 @@ export const Charging: Story = {
 		width: "200px",
 		onClick: fn(),
 	},
-	play: async ({ canvasElement }) => {
+	play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		const canvas = within(canvasElement);
 		const button = canvas.getByRole("button");
 
@@ -54,7 +54,7 @@ export const Ready: Story = {
 		gaugeColor: "#f1c40f",
 		onClick: fn(),
 	},
-	play: async ({ canvasElement }) => {
+	play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		const canvas = within(canvasElement);
 		const button = canvas.getByRole("button");
 
@@ -78,7 +78,7 @@ export const Disabled: Story = {
 		gaugeColor: "#f1c40f",
 		onClick: fn(),
 	},
-	play: async ({ canvasElement }) => {
+	play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		const canvas = within(canvasElement);
 		const button = canvas.getByRole("button");
 

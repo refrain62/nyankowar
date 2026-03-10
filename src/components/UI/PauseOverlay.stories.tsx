@@ -28,7 +28,14 @@ export const Default: Story = {
 		onRestart: fn(),
 		onQuit: fn(),
 	},
-	play: async ({ canvasElement, args }) => {
+	play: async ({
+		canvasElement,
+		args,
+	}: {
+		canvasElement: HTMLElement;
+		args: Story["args"];
+	}) => {
+		if (!args) return;
 		const canvas = within(canvasElement);
 
 		// 見出しの確認
