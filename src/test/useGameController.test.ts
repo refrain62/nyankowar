@@ -2,6 +2,7 @@ import { renderHook } from "@testing-library/react";
 import type { RefObject } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { STAGES } from "../constants/stages";
+import { UNIT_TYPES } from "../constants/units";
 import type { GameAudio } from "../hooks/useGameAudio";
 import { useGameController } from "../hooks/useGameController";
 import type { GameState, StageConfig } from "../types/game";
@@ -122,7 +123,11 @@ describe("useGameController", () => {
 				y: 0,
 				type: "enemy",
 				unitType: "ENEMY",
-				stats: { hp: 200 } as any,
+				/* 
+				   型安全性の確保: anyを排除し、UNIT_TYPES.ENEMYをベースにテストに必要なHP(200)を上書き。
+				   期待値検証において、キャノン砲のダメージ150を差し引いた後のHPが正確に50であることを確認するため。
+				*/
+				stats: { ...UNIT_TYPES.ENEMY, hp: 200 },
 				currentHp: 200,
 			},
 		];
