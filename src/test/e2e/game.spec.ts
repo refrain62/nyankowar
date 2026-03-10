@@ -152,16 +152,26 @@ test.describe("ねこねこ大戦争 E2Eシナリオ", () => {
 		// ユニットを定期的に召喚するループ
 		// CI環境での資金蓄積速度低下を補うため、チェック間隔を500msに短縮し、より攻撃的に召喚
 		const spawnUnits = async () => {
-			for (let i = 0; i < 100; i++) {
+			for (let i = 0; i < 200; i++) {
+				// 既に勝利または敗北画面が出ていたら即座に終了
+				if (
+					(await page.getByText("VICTORY").isVisible()) ||
+					(await page.getByText("DEFEAT").isVisible())
+				) {
+					break;
+				}
+
+				// ボタンが存在するか確認（アンマウント対策）
+				if (!(await basicButton.isVisible())) {
+					break;
+				}
+
 				if (await cowButton.isEnabled()) {
 					await cowButton.click();
 				} else if (await basicButton.isEnabled()) {
 					await basicButton.click();
 				}
 				await page.waitForTimeout(500);
-
-				// すでに勝利画面が出ていたら抜ける
-				if (await page.getByText("VICTORY").isVisible()) break;
 			}
 		};
 
