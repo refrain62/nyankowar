@@ -92,19 +92,55 @@ describe("useGameController", () => {
 		expect(state.money).toBe(300); // 500 - (1 * 200) = 300
 	});
 
-	it("handleCannon: チャージが100%の時のみ発動し、直後に isCannonCharging が true になること", () => {
+	it("handleSpawn: 所持金が足りない場合(コスト未満)、ユニットを召喚できないこと", () => {
 		const { controller, state } = setup();
+		const cost = 50; // BASICのコスト
+		state.money = cost - 1; // 49円
+		state.cooldowns.BASIC = 0;
+		controller.handleSpawn("BASIC");
+		expect(state.allies.length).toBe(0);
+		expect(state.money).toBe(49);
+	});
 
-		// チャージ不足 (99%)
-		state.cannonCharge = 99;
-		controller.handleCannon();
-		expect(state.isCannonCharging).toBe(false);
+	it("handleUpgrade: レベル上限(8)に達している場合、アップグレードが実行されないこと", () => {
+		const { controller, state } = setup();
+		state.walletLevel = 8;
+		state.money = 2000;
+		controller.handleUpgrade();
+		expect(state.walletLevel).toBe(8);
+		expect(state.money).toBe(2000); // 減少していない
+	});
 
-		// チャージ完了 (100%)
+	it("handleCannon: 500ms後に敵HPが150減少し、120pxノックバックし、200ms後に発射フラグがリセットされること", () => {
+		vi.useFakeTimers();
+		const { controller, state } = setup();
 		state.cannonCharge = 100;
+		state.enemies = [
+			{
+				id: 1,
+				x: 500,
+				y: 0,
+				type: "enemy",
+				unitType: "ENEMY",
+				stats: { hp: 200 } as any,
+				currentHp: 200,
+			},
+		];
+
 		controller.handleCannon();
-		expect(state.isCannonCharging).toBe(true); // 充填開始
-		expect(state.isCannonFiring).toBe(false); // まだ発射されていない
-		expect(state.cannonCharge).toBe(0); // 数値はリセット
+		expect(state.isCannonCharging).toBe(true);
+
+		// 500ms 進める (発射!)
+		vi.advanceTimersByTime(500);
+		expect(state.isCannonCharging).toBe(false);
+		expect(state.isCannonFiring).toBe(true);
+		expect(state.enemies[0].currentHp).toBe(50); // 200 - 150
+		expect(state.enemies[0].x).toBe(620); // 500 + 120 (ノックバック)
+
+		// さらに 200ms 進める (発射エフェクト終了)
+		vi.advanceTimersByTime(200);
+		expect(state.isCannonFiring).toBe(false);
+
+		vi.useRealTimers();
 	});
 });

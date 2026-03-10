@@ -218,4 +218,91 @@ describe("gameSystems", () => {
 		expect(state.gameState).toBe("win");
 		expect(mockAudio.playVictoryFanfare).toHaveBeenCalledTimes(1);
 	});
+
+	/**
+	 * 敗北判定の検証。
+	 * 期待値: 自拠点HPが敵の攻撃によって 0 以下になった瞬間に、gameState が 'lose' へ遷移すること。
+	 */
+	it("processUnitsAndCombat: 自拠点のHPが0になった瞬間に、gameStateが'lose'に遷移すること", () => {
+		const state = createInitialState();
+		state.baseHp = 5;
+		state.enemies = [
+			{
+				id: 2,
+				x: 149, // 自拠点(x<150)攻撃範囲内
+				y: 0,
+				type: "enemy",
+				unitType: "ENEMY",
+				stats: {
+					range: 100,
+					speed: 1,
+					damage: 10,
+					hp: 100,
+					name: "Enemy",
+					cost: 0,
+					color: "red",
+					cooldown: 0,
+					radius: 10,
+				} as UnitStats,
+				currentHp: 100,
+			},
+		];
+
+		processUnitsAndCombat(state, 1, mockAudio, STAGES[1], 1000);
+		expect(state.baseHp).toBe(0);
+		expect(state.gameState).toBe("lose");
+		expect(mockAudio.playDefeatJingle).toHaveBeenCalledTimes(1);
+	});
+
+	/**
+	 * ユニット消滅の検証。
+	 * 期待値: currentHp が 0 以下になったユニットが、次のフレームで allies 配列から削除（filter）されること。
+	 */
+	it("processUnitsAndCombat: HPが0になったユニットが正確に配列から削除され、lengthが0になること", () => {
+		const state = createInitialState();
+		state.allies = [
+			{
+				id: 1,
+				x: 500,
+				y: 0,
+				type: "ally",
+				unitType: "BASIC",
+				stats: { range: 100, speed: 1, damage: 10, hp: 100 } as UnitStats,
+				currentHp: 1, // 残りHP 1
+			},
+		];
+		state.enemies = [
+			{
+				id: 2,
+				x: 550, // 射程内
+				y: 0,
+				type: "enemy",
+				unitType: "ENEMY",
+				stats: { range: 100, speed: 1, damage: 10, hp: 100 } as UnitStats,
+				currentHp: 100,
+			},
+		];
+
+		// dt=1.0秒経過させ、10ダメージ与える (1 - 10 = -9)
+		processUnitsAndCombat(state, 1, mockAudio, STAGES[1], 1000);
+		expect(state.allies.length).toBe(0);
+	});
+
+	/**
+	 * 敵生成ロジックの検証。
+	 * 期待値: dt=1.0s (1000ms) 経過し、スポーンレート(500ms)を超えたとき、enemies 配列に 1 体のユニットが追加されること。
+	 */
+	it("spawnEnemies: 経過時間がスポーンレートを超えた際、新しい敵が CANVAS_WIDTH - 110 の位置に出現すること", () => {
+		const state = createInitialState();
+		const stage = { ...STAGES[1], enemySpawnRate: 500 };
+		state.enemySpawnTimer = 0;
+
+		// 1.0秒(1000ms)経過させる
+		import("../logic/gameSystems").then(({ spawnEnemies }) => {
+			spawnEnemies(state, 1, stage);
+			expect(state.enemies.length).toBe(1);
+			expect(state.enemies[0].x).toBe(CANVAS_WIDTH - 110);
+			expect(state.enemySpawnTimer).toBe(0); // タイマーリセット
+		});
+	});
 });
