@@ -17,6 +17,14 @@ const dirname =
 export default defineConfig({
 	plugins: [react()],
 	base: "./",
+	optimizeDeps: {
+		include: [
+			"@storybook/test",
+			"@storybook/addon-a11y/preview",
+			"@storybook/react-vite",
+			"@testing-library/jest-dom",
+		],
+	},
 	// GitHub Pages用に相対パスでビルドするように設定
 	test: {
 		globals: true,
