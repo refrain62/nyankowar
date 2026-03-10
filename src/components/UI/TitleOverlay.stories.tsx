@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, userEvent, within } from "@storybook/test";
+import { expect, fn, userEvent, within } from "@storybook/test";
 import { TitleOverlay } from "./TitleOverlay";
 
 const meta: Meta<typeof TitleOverlay> = {
@@ -8,8 +8,8 @@ const meta: Meta<typeof TitleOverlay> = {
 	parameters: {
 		layout: "fullscreen",
 	},
-	argTypes: {
-		onStart: { action: "onStart" },
+	args: {
+		onStart: fn(),
 	},
 };
 

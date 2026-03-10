@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, within } from "@storybook/test";
+import { expect, fn, within } from "@storybook/test";
 import { GaugeButton } from "./GaugeButton";
 
 const meta: Meta<typeof GaugeButton> = {
 	title: "UI/GaugeButton",
 	component: GaugeButton,
-	argTypes: {
-		onClick: { action: "clicked" },
+	args: {
+		onClick: fn(),
 	},
 };
 

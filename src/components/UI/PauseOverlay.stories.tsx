@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, userEvent, within } from "@storybook/test";
+import { expect, fn, userEvent, within } from "@storybook/test";
 import { stage1 } from "../../constants/stages/stage1";
 import { PauseOverlay } from "./PauseOverlay";
 
 const meta: Meta<typeof PauseOverlay> = {
 	title: "UI/PauseOverlay",
 	component: PauseOverlay,
-	argTypes: {
-		onResume: { action: "onResume" },
-		onRestart: { action: "onRestart" },
-		onQuit: { action: "onQuit" },
+	args: {
+		onResume: fn(),
+		onRestart: fn(),
+		onQuit: fn(),
 	},
 };
 
